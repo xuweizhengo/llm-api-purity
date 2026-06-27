@@ -80,6 +80,7 @@ function convertSite(site) {
   if (!site?.slug || !site?.canonical_host || !site?.name) return null;
 
   const primary = findPrimaryLink(site.links);
+  const entryUrl = cleanEntryUrl(primary?.url, site.canonical_host);
   const metrics = site.metrics || {};
   const publicRate = numberOr(metrics.lowest_rate, 1);
   const firstTokenMs = numberOr(metrics.first_token_ms, 0);
@@ -96,7 +97,7 @@ function convertSite(site) {
     recommendationLevel: site.recommendation_level || "none",
     riskLevel: site.risk_level || "unknown",
     publicRate,
-    entryUrl: primary?.url || `https://${site.canonical_host}`,
+    entryUrl,
     apiBaseUrl: site.api_base_url || `https://${site.canonical_host}`,
     region: site.region || "Unknown",
     supports: inferSupports(site),
@@ -146,6 +147,45 @@ async function readExistingSites(path) {
 
 function findPrimaryLink(links = []) {
   return links.find((link) => link.is_primary) || links.find((link) => link.url) || null;
+}
+
+function cleanEntryUrl(rawUrl, canonicalHost) {
+  const fallback = `https://${canonicalHost}`;
+  if (!rawUrl) return fallback;
+
+  try {
+    const url = new URL(rawUrl);
+    const removed = new Set();
+
+    for (const key of [...url.searchParams.keys()]) {
+      const normalized = key.toLowerCase();
+      if (
+        normalized.startsWith("utm_") ||
+        [
+          "aff",
+          "affiliate",
+          "invite",
+          "invitecode",
+          "invited_code",
+          "invitedcode",
+          "ref",
+          "referral",
+          "share"
+        ].includes(normalized)
+      ) {
+        url.searchParams.delete(key);
+        removed.add(normalized);
+      }
+    }
+
+    if (/\/(invite|referral)(\/|$)/i.test(url.pathname)) {
+      return `${url.origin}/`;
+    }
+
+    return url.toString();
+  } catch {
+    return fallback;
+  }
 }
 
 function inferSupports(site) {
