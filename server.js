@@ -6,6 +6,8 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const PUBLIC_DIR = join(__dirname, "public");
+const DATA_DIR = join(__dirname, "data");
+const RANKING_FILE = join(DATA_DIR, "providers.json");
 const PORT = Number.parseInt(process.env.PORT || "3078", 10);
 const REQUEST_TIMEOUT_MS = Number.parseInt(process.env.REQUEST_TIMEOUT_MS || "45000", 10);
 const MAX_BODY_BYTES = 32 * 1024;
@@ -43,6 +45,12 @@ const server = http.createServer(async (req, res) => {
 
     if (req.method === "GET" && req.url === "/api/sample") {
       sendJson(res, 200, buildSampleReport());
+      return;
+    }
+
+    if (req.method === "GET" && req.url === "/api/ranking") {
+      const ranking = await loadRanking();
+      sendJson(res, 200, ranking);
       return;
     }
 
@@ -902,6 +910,54 @@ function buildSampleReport() {
       cacheControl: "no-store"
     }
   };
+}
+
+async function loadRanking() {
+  const raw = await readFile(RANKING_FILE, "utf8");
+  const providers = JSON.parse(raw).map((provider, index) => {
+    const compositeScore = scoreProvider(provider);
+    return {
+      rank: index + 1,
+      compositeScore,
+      ...provider
+    };
+  });
+
+  providers.sort((a, b) => b.compositeScore - a.compositeScore);
+  providers.forEach((provider, index) => {
+    provider.rank = index + 1;
+  });
+
+  const stable = providers.filter((provider) => provider.status === "stable").length;
+  const avgPurity = round(providers.reduce((sum, provider) => sum + Number(provider.purityScore || 0), 0) / providers.length, 1);
+  const avgFirstToken = Math.round(providers.reduce((sum, provider) => sum + Number(provider.firstTokenMs || 0), 0) / providers.length);
+  const updatedAt = providers
+    .map((provider) => provider.lastChecked)
+    .filter(Boolean)
+    .sort()
+    .at(-1);
+
+  return {
+    updatedAt,
+    source: "seed-data",
+    stats: {
+      total: providers.length,
+      stable,
+      avgPurity,
+      avgFirstToken
+    },
+    providers
+  };
+}
+
+function scoreProvider(provider) {
+  const purity = Number(provider.purityScore || 0);
+  const uptime = Number(provider.uptime || 0);
+  const latency = Number(provider.firstTokenMs || 3000);
+  const multiplier = Number(provider.multiplier || 1);
+  const latencyScore = Math.max(0, 100 - latency / 30);
+  const multiplierScore = Math.max(0, 100 - Math.abs(multiplier - 1) * 55);
+  return round(purity * 0.5 + uptime * 0.22 + latencyScore * 0.16 + multiplierScore * 0.12, 1);
 }
 
 async function serveStatic(req, res) {

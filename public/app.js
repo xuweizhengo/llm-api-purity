@@ -6,8 +6,21 @@ const sampleButton = document.querySelector("#sample-report");
 const providerInputs = document.querySelectorAll("input[name='provider']");
 const baseUrlInput = document.querySelector("#base-url");
 const modelInput = document.querySelector("#model");
+const rankingGrid = document.querySelector("#ranking-grid");
+const rankingTableBody = document.querySelector("#ranking-table-body");
+const rankingStats = document.querySelector("#ranking-stats");
+const rankingUpdated = document.querySelector("#ranking-updated");
+const rankingSearch = document.querySelector("#ranking-search");
+const rankingProvider = document.querySelector("#ranking-provider");
+const rankingSort = document.querySelector("#ranking-sort");
 
 let currentReport = null;
+let rankingState = {
+  loaded: false,
+  providers: [],
+  stats: null,
+  updatedAt: null
+};
 
 const providerDefaults = {
   openai: {
@@ -46,6 +59,11 @@ function initialize() {
 
   document.querySelectorAll("[data-target]").forEach((button) => {
     button.addEventListener("click", () => showPage(button.dataset.target));
+  });
+
+  [rankingSearch, rankingProvider, rankingSort].forEach((control) => {
+    control?.addEventListener("input", renderRanking);
+    control?.addEventListener("change", renderRanking);
   });
 
   window.addEventListener("hashchange", () => {
@@ -286,6 +304,160 @@ function showPage(target, updateHash = true) {
 
   if (updateHash) history.pushState(null, "", `#${target}`);
   window.scrollTo({ top: 0, behavior: "smooth" });
+
+  if (target === "ranking") {
+    loadRanking();
+  }
+}
+
+async function loadRanking() {
+  if (rankingState.loaded) {
+    renderRanking();
+    return;
+  }
+
+  try {
+    const response = await fetch("/api/ranking");
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || "榜单加载失败");
+    rankingState = {
+      loaded: true,
+      providers: data.providers || [],
+      stats: data.stats || null,
+      updatedAt: data.updatedAt || null
+    };
+    renderRanking();
+  } catch (error) {
+    rankingGrid.innerHTML = `<div class="ranking-empty">${escapeHtml(error.message || "榜单加载失败")}</div>`;
+    rankingTableBody.innerHTML = `<tr><td colspan="9">榜单加载失败</td></tr>`;
+  }
+}
+
+function renderRanking() {
+  if (!rankingState.loaded) return;
+  const query = (rankingSearch?.value || "").trim().toLowerCase();
+  const providerFilter = rankingProvider?.value || "all";
+  const sortBy = rankingSort?.value || "score";
+
+  let providers = rankingState.providers.filter((provider) => {
+    const text = [
+      provider.name,
+      provider.subtitle,
+      provider.provider,
+      provider.region,
+      provider.status,
+      ...(provider.tags || []),
+      ...(provider.supports || [])
+    ]
+      .join(" ")
+      .toLowerCase();
+    const matchesSearch = !query || text.includes(query);
+    const providerText = String(provider.provider || "").toLowerCase();
+    const matchesProvider =
+      providerFilter === "all" ||
+      (providerFilter === "openai" && providerText.includes("openai")) ||
+      (providerFilter === "claude" && providerText.includes("claude")) ||
+      (providerFilter === "compatible" && providerText.includes("compatible"));
+    return matchesSearch && matchesProvider;
+  });
+
+  providers = providers.sort((a, b) => compareProviders(a, b, sortBy));
+
+  renderRankingStats(rankingState.stats, providers.length);
+  renderRankingCards(providers.slice(0, 3));
+  renderRankingTable(providers);
+  rankingUpdated.textContent = rankingState.updatedAt
+    ? `更新于 ${formatDate(rankingState.updatedAt)} · 当前显示 ${providers.length} 项`
+    : `当前显示 ${providers.length} 项`;
+}
+
+function compareProviders(a, b, sortBy) {
+  if (sortBy === "purity") return Number(b.purityScore || 0) - Number(a.purityScore || 0);
+  if (sortBy === "uptime") return Number(b.uptime || 0) - Number(a.uptime || 0);
+  if (sortBy === "latency") return Number(a.firstTokenMs || 999999) - Number(b.firstTokenMs || 999999);
+  if (sortBy === "multiplier") {
+    return Math.abs(Number(a.multiplier || 1) - 1) - Math.abs(Number(b.multiplier || 1) - 1);
+  }
+  return Number(b.compositeScore || 0) - Number(a.compositeScore || 0);
+}
+
+function renderRankingStats(stats, visibleCount) {
+  if (!rankingStats || !stats) return;
+  const values = [
+    ["站点数量", `${visibleCount}/${stats.total}`],
+    ["稳定站点", stats.stable],
+    ["平均纯度", `${stats.avgPurity}%`],
+    ["平均首 Token", `${stats.avgFirstToken}ms`]
+  ];
+  rankingStats.innerHTML = values
+    .map(([label, value]) => `<div><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></div>`)
+    .join("");
+}
+
+function renderRankingCards(providers) {
+  if (!providers.length) {
+    rankingGrid.innerHTML = `<div class="ranking-empty">没有匹配的站点。</div>`;
+    return;
+  }
+
+  rankingGrid.innerHTML = providers
+    .map((provider, index) => {
+      const tags = (provider.tags || []).slice(0, 4).map((tag) => `<span>${escapeHtml(tag)}</span>`).join("");
+      return `
+        <article class="ranking-card">
+          <div class="ranking-card-top">
+            <div class="rank-badge">#${index + 1}</div>
+            <div>
+              <h2>${escapeHtml(provider.name)}</h2>
+              <p>${escapeHtml(provider.subtitle || provider.note || "")}</p>
+            </div>
+            <span class="score-badge">${formatNumber(provider.compositeScore)}</span>
+          </div>
+          <div class="ranking-metrics">
+            <div><span>纯度</span><strong>${formatNumber(provider.purityScore)}%</strong></div>
+            <div><span>可用率</span><strong>${formatNumber(provider.uptime)}%</strong></div>
+            <div><span>首 Token</span><strong>${formatNumber(provider.firstTokenMs)}ms</strong></div>
+          </div>
+          <div class="tag-row">${tags}</div>
+          <div class="ranking-card-footer">
+            <span class="status ${escapeHtml(provider.status)}">${statusText(provider.status)}</span>
+            <a class="visit-link" href="${escapeAttribute(provider.entryUrl)}" target="_blank" rel="noreferrer">访问入口</a>
+          </div>
+        </article>
+      `;
+    })
+    .join("");
+}
+
+function renderRankingTable(providers) {
+  if (!providers.length) {
+    rankingTableBody.innerHTML = `<tr><td colspan="9">没有匹配的站点。</td></tr>`;
+    return;
+  }
+
+  rankingTableBody.innerHTML = providers
+    .map((provider, index) => {
+      return `
+        <tr>
+          <td>${index + 1}</td>
+          <td class="site-cell">
+            <strong>${escapeHtml(provider.name)}</strong>
+            <span>${escapeHtml(provider.subtitle || "")}</span>
+          </td>
+          <td>
+            <strong>${escapeHtml(provider.provider)}</strong>
+            <div class="support-list">${escapeHtml((provider.supports || []).join(" · "))}</div>
+          </td>
+          <td>${formatNumber(provider.purityScore)}%</td>
+          <td>${formatNumber(provider.uptime)}%</td>
+          <td>${formatNumber(provider.firstTokenMs)}ms</td>
+          <td>${formatRatio(provider.multiplier)}</td>
+          <td><span class="status ${escapeHtml(provider.status)}">${statusText(provider.status)}</span></td>
+          <td><a class="visit-link" href="${escapeAttribute(provider.entryUrl)}" target="_blank" rel="noreferrer">打开</a></td>
+        </tr>
+      `;
+    })
+    .join("");
 }
 
 function setLoading(loading, text = "检测中") {
@@ -336,6 +508,23 @@ function formatRatio(value) {
   return `${number.toFixed(2).replace(/0+$/, "").replace(/\.$/, "")}x`;
 }
 
+function formatDate(value) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleString("zh-CN", {
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+}
+
+function statusText(value) {
+  if (value === "stable") return "稳定";
+  if (value === "watch") return "观察";
+  return value || "未知";
+}
+
 function escapeHtml(value) {
   return String(value ?? "")
     .replaceAll("&", "&amp;")
@@ -343,4 +532,8 @@ function escapeHtml(value) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
+}
+
+function escapeAttribute(value) {
+  return escapeHtml(value).replaceAll("`", "&#096;");
 }

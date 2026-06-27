@@ -96,13 +96,80 @@
       </section>
 
       <section class="page-shell" id="ranking">
-        <div class="simple-panel">
-          <p class="eyebrow">API 代理站点榜单</p>
-          <h1>榜单模块预留</h1>
-          <p>
-            这里可以继续扩展成代理站目录：公开倍率、可用率、首 Token 延迟、最近检测时间和入口链接。
-            先把纯度检测跑通，榜单就能自然接上。
-          </p>
+        <div class="ranking-head">
+          <div>
+            <p class="eyebrow">API 代理站点榜单</p>
+            <h1>LLM API Relay Radar</h1>
+            <p>
+              按纯度分、可用率、首 Token 延迟和公开倍率生成综合排序。当前为种子榜单，
+              后续可把真实检测结果写入 <code>data/providers.json</code>。
+            </p>
+          </div>
+          <a class="primary-button compact" href="#purity">检测新站点</a>
+        </div>
+
+        <div class="ranking-stats" id="ranking-stats">
+          <div><span>站点数量</span><strong>--</strong></div>
+          <div><span>稳定站点</span><strong>--</strong></div>
+          <div><span>平均纯度</span><strong>--</strong></div>
+          <div><span>平均首 Token</span><strong>--</strong></div>
+        </div>
+
+        <div class="ranking-toolbar">
+          <label>
+            <span>搜索</span>
+            <input id="ranking-search" placeholder="OpenAI / Claude / relay / CN" />
+          </label>
+          <label>
+            <span>协议</span>
+            <select id="ranking-provider">
+              <option value="all">全部协议</option>
+              <option value="openai">OpenAI</option>
+              <option value="claude">Claude</option>
+              <option value="compatible">Compatible</option>
+            </select>
+          </label>
+          <label>
+            <span>排序</span>
+            <select id="ranking-sort">
+              <option value="score">综合分</option>
+              <option value="purity">纯度分</option>
+              <option value="uptime">可用率</option>
+              <option value="latency">首 Token</option>
+              <option value="multiplier">倍率</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="ranking-grid" id="ranking-grid" aria-live="polite">
+          <div class="ranking-empty">榜单加载中...</div>
+        </div>
+
+        <div class="ranking-table-wrap">
+          <div class="ranking-table-head">
+            <h2>完整榜单</h2>
+            <span id="ranking-updated">等待数据</span>
+          </div>
+          <div class="ranking-table-scroll">
+            <table class="ranking-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>站点</th>
+                  <th>协议</th>
+                  <th>纯度</th>
+                  <th>可用率</th>
+                  <th>首 Token</th>
+                  <th>倍率</th>
+                  <th>状态</th>
+                  <th>入口</th>
+                </tr>
+              </thead>
+              <tbody id="ranking-table-body">
+                <tr><td colspan="9">榜单加载中...</td></tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </section>
 
