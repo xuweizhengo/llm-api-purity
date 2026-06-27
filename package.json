@@ -1,0 +1,27 @@
+{
+  "name": "llm-api-purity",
+  "version": "0.1.0",
+  "description": "OpenAI and Claude API purity checker with a local no-store test console.",
+  "type": "module",
+  "private": false,
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "check": "node --check server.js && node --check public/app.js"
+  },
+  "keywords": [
+    "llm",
+    "openai",
+    "claude",
+    "anthropic",
+    "api",
+    "purity",
+    "proxy",
+    "checker"
+  ],
+  "author": "xuweizhengo",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  }
+}
