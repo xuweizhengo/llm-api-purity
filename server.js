@@ -1,16 +1,24 @@
 import http from "node:http";
 import { createHash, randomBytes } from "node:crypto";
-import { readFile, stat } from "node:fs/promises";
+import { mkdir, readFile, stat, writeFile } from "node:fs/promises";
 import { extname, join, normalize } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const PUBLIC_DIR = join(__dirname, "public");
 const DATA_DIR = join(__dirname, "data");
-const RANKING_FILE = join(DATA_DIR, "providers.json");
+const RANKING_SITES_FILE = join(DATA_DIR, "sites.json");
+const RANKING_RESULTS_FILE = join(DATA_DIR, "monitor-results.json");
 const PORT = Number.parseInt(process.env.PORT || "3078", 10);
 const REQUEST_TIMEOUT_MS = Number.parseInt(process.env.REQUEST_TIMEOUT_MS || "45000", 10);
+const MONITOR_INTERVAL_MS = Number.parseInt(process.env.MONITOR_INTERVAL_MS || "1800000", 10);
+const MONITOR_ON_START = process.env.MONITOR_ON_START === "true";
+const MONITOR_DEEP_CHECKS = process.env.MONITOR_DEEP_CHECKS === "true";
 const MAX_BODY_BYTES = 32 * 1024;
+
+let rankingCache = null;
+let monitorTimer = null;
+let monitorRunning = false;
 
 const ONE_PIXEL_PNG =
   "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=";
@@ -54,6 +62,14 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
+    if (req.method === "POST" && req.url === "/api/ranking/refresh") {
+      authorizeRankingRefresh(req);
+      await runRankingMonitor({ force: true });
+      const ranking = await loadRanking();
+      sendJson(res, 200, ranking);
+      return;
+    }
+
     if (req.method === "GET") {
       await serveStatic(req, res);
       return;
@@ -71,6 +87,7 @@ const server = http.createServer(async (req, res) => {
 
 server.listen(PORT, () => {
   console.log(`LLM API Purity is running at http://localhost:${PORT}`);
+  startRankingMonitor();
 });
 
 async function runPurityCheck(input) {
@@ -913,33 +930,35 @@ function buildSampleReport() {
 }
 
 async function loadRanking() {
-  const raw = await readFile(RANKING_FILE, "utf8");
-  const providers = JSON.parse(raw).map((provider, index) => {
-    const compositeScore = scoreProvider(provider);
-    return {
-      rank: index + 1,
-      compositeScore,
-      ...provider
-    };
-  });
+  if (rankingCache) return rankingCache;
+
+  const sites = await readSites();
+  const results = await readMonitorResults();
+  const providers = sites.map((site) => buildRankingProvider(site, results.sites?.[site.slug]));
 
   providers.sort((a, b) => b.compositeScore - a.compositeScore);
   providers.forEach((provider, index) => {
     provider.rank = index + 1;
   });
 
-  const stable = providers.filter((provider) => provider.status === "stable").length;
+  const stable = providers.filter((provider) => provider.available).length;
   const avgPurity = round(providers.reduce((sum, provider) => sum + Number(provider.purityScore || 0), 0) / providers.length, 1);
   const avgFirstToken = Math.round(providers.reduce((sum, provider) => sum + Number(provider.firstTokenMs || 0), 0) / providers.length);
   const updatedAt = providers
-    .map((provider) => provider.lastChecked)
+    .map((provider) => provider.checkedAt)
     .filter(Boolean)
     .sort()
     .at(-1);
 
-  return {
+  rankingCache = {
     updatedAt,
-    source: "seed-data",
+    source: results.updatedAt ? "backend-monitor" : "backend-config",
+    monitor: {
+      intervalMs: MONITOR_INTERVAL_MS,
+      deepChecks: MONITOR_DEEP_CHECKS,
+      running: monitorRunning,
+      nextRunHint: MONITOR_INTERVAL_MS > 0 ? "scheduled" : "disabled"
+    },
     stats: {
       total: providers.length,
       stable,
@@ -948,16 +967,289 @@ async function loadRanking() {
     },
     providers
   };
+
+  return rankingCache;
 }
 
 function scoreProvider(provider) {
   const purity = Number(provider.purityScore || 0);
-  const uptime = Number(provider.uptime || 0);
+  const uptime = Number(provider.uptime24h || provider.uptime || 0);
   const latency = Number(provider.firstTokenMs || 3000);
-  const multiplier = Number(provider.multiplier || 1);
+  const multiplier = Number(provider.lowestRate || provider.multiplier || 1);
   const latencyScore = Math.max(0, 100 - latency / 30);
   const multiplierScore = Math.max(0, 100 - Math.abs(multiplier - 1) * 55);
   return round(purity * 0.5 + uptime * 0.22 + latencyScore * 0.16 + multiplierScore * 0.12, 1);
+}
+
+async function startRankingMonitor() {
+  if (MONITOR_INTERVAL_MS > 0 && !monitorTimer) {
+    monitorTimer = setInterval(() => {
+      runRankingMonitor().catch((error) => {
+        console.warn("ranking monitor failed:", sanitizeError(error));
+      });
+    }, MONITOR_INTERVAL_MS);
+    monitorTimer.unref?.();
+  }
+
+  if (MONITOR_ON_START) {
+    setTimeout(() => {
+      runRankingMonitor().catch((error) => {
+        console.warn("initial ranking monitor failed:", sanitizeError(error));
+      });
+    }, 1500).unref?.();
+  }
+}
+
+async function runRankingMonitor({ force = false } = {}) {
+  if (monitorRunning && !force) return;
+  monitorRunning = true;
+  try {
+    const sites = await readSites();
+    const previous = await readMonitorResults();
+    const next = {
+      updatedAt: new Date().toISOString(),
+      intervalMs: MONITOR_INTERVAL_MS,
+      deepChecks: MONITOR_DEEP_CHECKS,
+      sites: { ...(previous.sites || {}) }
+    };
+
+    for (const site of sites) {
+      if (site.monitor?.enabled === false) {
+        next.sites[site.slug] = buildSkippedMonitorResult(site, next.sites[site.slug]);
+        continue;
+      }
+      next.sites[site.slug] = await monitorSite(site, next.sites[site.slug]);
+    }
+
+    await mkdir(DATA_DIR, { recursive: true });
+    await writeFile(RANKING_RESULTS_FILE, JSON.stringify(next, null, 2), "utf8");
+    rankingCache = null;
+  } finally {
+    monitorRunning = false;
+  }
+}
+
+async function monitorSite(site, previous = {}) {
+  const checkedAt = new Date().toISOString();
+  const light = await probePublicEndpoint(site.entryUrl || site.apiBaseUrl);
+  const apiKeyEnv = site.monitor?.apiKeyEnv;
+  const apiKey = apiKeyEnv ? process.env[apiKeyEnv] : "";
+  const canDeepCheck = MONITOR_DEEP_CHECKS && apiKey && site.monitor?.kind && site.monitor?.model;
+  let deep = null;
+
+  if (canDeepCheck) {
+    deep = await safeProbe("scheduled purity check", async () => {
+      const report = await runPurityCheck({
+        provider: site.monitor.kind,
+        baseUrl: site.apiBaseUrl,
+        apiKey,
+        model: site.monitor.model,
+        tokenAudit: false
+      });
+      return {
+        ok: report.score >= 60,
+        status: 200,
+        evidence: report.verdict,
+        details: {
+          score: report.score,
+          latencyMs: report.metrics?.latencyMs || 0
+        },
+        usage: emptyUsage()
+      };
+    });
+  }
+
+  const deepOk = deep?.ok && deep?.details?.score >= 60;
+  const available = Boolean(deep ? deepOk : light.available);
+  const latestResponseMs = Number(deep?.details?.latencyMs || light.responseMs || site.baseline?.latestResponseMs || 0);
+  const purityScore = Number(deep?.details?.score || previous.purityScore || site.baseline?.purityScore || 0);
+  const firstTokenMs = Number(previous.firstTokenMs || site.baseline?.firstTokenMs || latestResponseMs || 0);
+  const history = trimHistory([
+    ...(previous.history || []),
+    {
+      at: checkedAt,
+      available,
+      responseMs: latestResponseMs,
+      status: light.status || deep?.status || 0
+    }
+  ]);
+
+  return {
+    checkedAt,
+    available,
+    monitorMode: canDeepCheck ? "deep" : "public",
+    status: light.status || deep?.status || 0,
+    statusText: light.statusText || "",
+    purityScore,
+    uptime24h: calcUptime(history, site.baseline?.uptime24h),
+    firstTokenMs,
+    latestResponseMs,
+    lastError: available ? "" : light.error || deep?.evidence || "Monitor probe failed",
+    history
+  };
+}
+
+async function probePublicEndpoint(url) {
+  const started = Date.now();
+  if (!url || url.includes("your-one-api.example.com")) {
+    return { available: false, status: 0, responseMs: 0, error: "No public monitor URL configured" };
+  }
+
+  for (const method of ["HEAD", "GET"]) {
+    try {
+      const response = await apiFetchWithTimeout(url, {
+        method,
+        headers: {
+          "user-agent": "PureAPI-Radar/0.1 (+https://github.com/xuweizhengo/llm-api-purity)",
+          "cache-control": "no-store"
+        }
+      }, 12000);
+      return {
+        available: response.status > 0 && response.status < 500,
+        status: response.status,
+        statusText: response.statusText,
+        responseMs: Date.now() - started
+      };
+    } catch (error) {
+      if (method === "GET") {
+        return {
+          available: false,
+          status: 0,
+          responseMs: Date.now() - started,
+          error: sanitizeError(error)
+        };
+      }
+    }
+  }
+
+  return { available: false, status: 0, responseMs: Date.now() - started, error: "Unknown monitor failure" };
+}
+
+async function apiFetchWithTimeout(url, options, timeoutMs) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(url, {
+      ...options,
+      signal: controller.signal
+    });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+function buildRankingProvider(site, result = {}) {
+  const baseline = site.baseline || {};
+  const provider = {
+    id: site.slug,
+    slug: site.slug,
+    name: site.name,
+    subtitle: site.summary,
+    summary: site.summary,
+    canonicalHost: site.canonicalHost,
+    siteKind: site.siteKind,
+    recommendationLevel: site.recommendationLevel,
+    riskLevel: site.riskLevel,
+    entryUrl: site.entryUrl,
+    apiBase: site.apiBaseUrl,
+    apiBaseUrl: site.apiBaseUrl,
+    provider: displayProvider(site),
+    region: site.region,
+    purityScore: Number(result.purityScore ?? baseline.purityScore ?? 0),
+    uptime24h: Number(result.uptime24h ?? baseline.uptime24h ?? 0),
+    uptime: Number(result.uptime24h ?? baseline.uptime24h ?? 0),
+    firstTokenMs: Number(result.firstTokenMs ?? baseline.firstTokenMs ?? 0),
+    latestResponseMs: Number(result.latestResponseMs ?? baseline.latestResponseMs ?? 0),
+    lowestRate: Number(site.publicRate ?? 1),
+    multiplier: Number(site.publicRate ?? 1),
+    available: Boolean(result.checkedAt ? result.available : true),
+    status: result.checkedAt ? (result.available ? "stable" : "watch") : statusFromRecommendation(site.recommendationLevel),
+    supports: site.supports || [],
+    tags: site.tags || [],
+    checkedAt: result.checkedAt || null,
+    updatedAt: result.checkedAt || null,
+    source: result.checkedAt ? "monitor" : "baseline",
+    monitorMode: result.monitorMode || "baseline",
+    lastError: result.lastError || "",
+    note: site.note || "",
+    metrics: {
+      lowest_rate: Number(site.publicRate ?? 1),
+      uptime_24h: Number(result.uptime24h ?? baseline.uptime24h ?? 0),
+      available: Boolean(result.checkedAt ? result.available : true),
+      first_token_ms: Number(result.firstTokenMs ?? baseline.firstTokenMs ?? 0),
+      latest_response_ms: Number(result.latestResponseMs ?? baseline.latestResponseMs ?? 0),
+      checked_at: result.checkedAt || null,
+      rate_updated_at: null
+    }
+  };
+
+  provider.compositeScore = scoreProvider(provider);
+  return provider;
+}
+
+function buildSkippedMonitorResult(site, previous = {}) {
+  return {
+    ...previous,
+    monitorMode: "disabled",
+    available: previous.available ?? false,
+    purityScore: previous.purityScore ?? site.baseline?.purityScore ?? 0,
+    uptime24h: previous.uptime24h ?? site.baseline?.uptime24h ?? 0,
+    firstTokenMs: previous.firstTokenMs ?? site.baseline?.firstTokenMs ?? 0,
+    latestResponseMs: previous.latestResponseMs ?? site.baseline?.latestResponseMs ?? 0,
+    lastError: previous.lastError || "Monitor disabled for this site"
+  };
+}
+
+async function readSites() {
+  return JSON.parse(await readFile(RANKING_SITES_FILE, "utf8"));
+}
+
+async function readMonitorResults() {
+  try {
+    return JSON.parse(await readFile(RANKING_RESULTS_FILE, "utf8"));
+  } catch {
+    return { updatedAt: null, sites: {} };
+  }
+}
+
+function trimHistory(history) {
+  const cutoff = Date.now() - 24 * 60 * 60 * 1000;
+  return history
+    .filter((item) => new Date(item.at).getTime() >= cutoff)
+    .slice(-288);
+}
+
+function calcUptime(history, fallback = 0) {
+  if (!history.length) return Number(fallback || 0);
+  const ok = history.filter((item) => item.available).length;
+  return round((ok / history.length) * 100, 2);
+}
+
+function displayProvider(site) {
+  if (site.siteKind === "official" && site.monitor?.kind === "openai") return "OpenAI";
+  if (site.siteKind === "official" && site.monitor?.kind === "claude") return "Claude";
+  if (site.monitor?.kind === "claude") return "Claude Compatible";
+  if (site.siteKind === "api_relay") return "OpenAI / Claude Compatible";
+  return "OpenAI Compatible";
+}
+
+function statusFromRecommendation(level) {
+  if (level === "recommended" || level === "neutral") return "stable";
+  return "watch";
+}
+
+function authorizeRankingRefresh(req) {
+  const adminToken = process.env.RANKING_ADMIN_TOKEN;
+  if (adminToken) {
+    const header = req.headers.authorization || "";
+    if (header === `Bearer ${adminToken}`) return;
+    throw userError("Unauthorized ranking refresh.", 401);
+  }
+
+  const remote = req.socket.remoteAddress;
+  const localAddresses = new Set(["127.0.0.1", "::1", "::ffff:127.0.0.1"]);
+  if (localAddresses.has(remote)) return;
+  throw userError("Ranking refresh is local-only unless RANKING_ADMIN_TOKEN is set.", 403);
 }
 
 async function serveStatic(req, res) {

@@ -329,7 +329,7 @@ async function loadRanking() {
     renderRanking();
   } catch (error) {
     rankingGrid.innerHTML = `<div class="ranking-empty">${escapeHtml(error.message || "榜单加载失败")}</div>`;
-    rankingTableBody.innerHTML = `<tr><td colspan="9">榜单加载失败</td></tr>`;
+    rankingTableBody.innerHTML = `<tr><td colspan="10">榜单加载失败</td></tr>`;
   }
 }
 
@@ -414,9 +414,10 @@ function renderRankingCards(providers) {
             <span class="score-badge">${formatNumber(provider.compositeScore)}</span>
           </div>
           <div class="ranking-metrics">
-            <div><span>纯度</span><strong>${formatNumber(provider.purityScore)}%</strong></div>
-            <div><span>可用率</span><strong>${formatNumber(provider.uptime)}%</strong></div>
+            <div><span>最低倍率</span><strong>${formatRatio(provider.lowestRate || provider.multiplier)}</strong></div>
+            <div><span>24h 可用率</span><strong>${formatNumber(provider.uptime)}%</strong></div>
             <div><span>首 Token</span><strong>${formatNumber(provider.firstTokenMs)}ms</strong></div>
+            <div><span>最新响应</span><strong>${formatNumber(provider.latestResponseMs)}ms</strong></div>
           </div>
           <div class="tag-row">${tags}</div>
           <div class="ranking-card-footer">
@@ -431,7 +432,7 @@ function renderRankingCards(providers) {
 
 function renderRankingTable(providers) {
   if (!providers.length) {
-    rankingTableBody.innerHTML = `<tr><td colspan="9">没有匹配的站点。</td></tr>`;
+    rankingTableBody.innerHTML = `<tr><td colspan="10">没有匹配的站点。</td></tr>`;
     return;
   }
 
@@ -451,6 +452,7 @@ function renderRankingTable(providers) {
           <td>${formatNumber(provider.purityScore)}%</td>
           <td>${formatNumber(provider.uptime)}%</td>
           <td>${formatNumber(provider.firstTokenMs)}ms</td>
+          <td>${formatNumber(provider.latestResponseMs)}ms</td>
           <td>${formatRatio(provider.multiplier)}</td>
           <td><span class="status ${escapeHtml(provider.status)}">${statusText(provider.status)}</span></td>
           <td><a class="visit-link" href="${escapeAttribute(provider.entryUrl)}" target="_blank" rel="noreferrer">打开</a></td>

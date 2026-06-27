@@ -101,8 +101,8 @@
             <p class="eyebrow">API 代理站点榜单</p>
             <h1>LLM API Relay Radar</h1>
             <p>
-              按纯度分、可用率、首 Token 延迟和公开倍率生成综合排序。当前为种子榜单，
-              后续可把真实检测结果写入 <code>data/providers.json</code>。
+              按最低倍率、24h 可用率、首 Token 延迟、最新响应和纯度分生成综合排序。
+              站点目录来自后端 <code>data/sites.json</code>，监控结果由定时任务写入运行时结果文件。
             </p>
           </div>
           <a class="primary-button compact" href="#purity">检测新站点</a>
@@ -156,17 +156,18 @@
                 <tr>
                   <th>#</th>
                   <th>站点</th>
-                  <th>协议</th>
+                  <th>类型 / 协议</th>
                   <th>纯度</th>
-                  <th>可用率</th>
+                  <th>24h 可用率</th>
                   <th>首 Token</th>
+                  <th>最新响应</th>
                   <th>倍率</th>
                   <th>状态</th>
                   <th>入口</th>
                 </tr>
               </thead>
               <tbody id="ranking-table-body">
-                <tr><td colspan="9">榜单加载中...</td></tr>
+                <tr><td colspan="10">榜单加载中...</td></tr>
               </tbody>
             </table>
           </div>

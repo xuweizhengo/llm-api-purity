@@ -7,5 +7,6 @@ pnpm-debug.log*
 yarn-debug.log*
 dist/
 coverage/
+data/monitor-results.json
 .DS_Store
 *.local

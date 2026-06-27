@@ -845,7 +845,7 @@ fieldset {
 
 .ranking-metrics {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 8px;
   margin: 16px 0;
 }
@@ -945,7 +945,7 @@ fieldset {
 
 .ranking-table {
   width: 100%;
-  min-width: 920px;
+  min-width: 1040px;
   border-collapse: collapse;
   font-size: 14px;
 }
@@ -967,7 +967,8 @@ fieldset {
 .ranking-table td:nth-child(4),
 .ranking-table td:nth-child(5),
 .ranking-table td:nth-child(6),
-.ranking-table td:nth-child(7) {
+.ranking-table td:nth-child(7),
+.ranking-table td:nth-child(8) {
   font-weight: 800;
 }
 

@@ -1,0 +1,254 @@
+[
+  {
+    "slug": "openai-official",
+    "name": "OpenAI Official",
+    "summary": "Official OpenAI API baseline",
+    "canonicalHost": "api.openai.com",
+    "siteKind": "official",
+    "recommendationLevel": "recommended",
+    "riskLevel": "low",
+    "publicRate": 1,
+    "entryUrl": "https://platform.openai.com",
+    "apiBaseUrl": "https://api.openai.com",
+    "region": "Global",
+    "supports": ["Responses", "Chat", "Tool Call", "Streaming", "Vision", "Usage"],
+    "tags": ["official", "baseline", "no-relay"],
+    "baseline": {
+      "purityScore": 99,
+      "uptime24h": 99.99,
+      "firstTokenMs": 620,
+      "latestResponseMs": 620
+    },
+    "monitor": {
+      "enabled": true,
+      "kind": "openai",
+      "apiKeyEnv": "OPENAI_API_KEY",
+      "model": "gpt-4o-mini"
+    },
+    "note": "Official baseline used for comparing relay behavior and token accounting."
+  },
+  {
+    "slug": "anthropic-official",
+    "name": "Anthropic Official",
+    "summary": "Official Claude API baseline",
+    "canonicalHost": "api.anthropic.com",
+    "siteKind": "official",
+    "recommendationLevel": "recommended",
+    "riskLevel": "low",
+    "publicRate": 1,
+    "entryUrl": "https://console.anthropic.com",
+    "apiBaseUrl": "https://api.anthropic.com",
+    "region": "Global",
+    "supports": ["Messages", "Tool Use", "Streaming", "Vision", "Cache", "Usage"],
+    "tags": ["official", "baseline", "no-relay"],
+    "baseline": {
+      "purityScore": 99,
+      "uptime24h": 99.98,
+      "firstTokenMs": 680,
+      "latestResponseMs": 680
+    },
+    "monitor": {
+      "enabled": true,
+      "kind": "claude",
+      "apiKeyEnv": "ANTHROPIC_API_KEY",
+      "model": "claude-3-5-haiku-latest"
+    },
+    "note": "Official Claude baseline for Messages API, tool_use, SSE and cache usage fields."
+  },
+  {
+    "slug": "openrouter",
+    "name": "OpenRouter",
+    "summary": "Multi-model router with OpenAI-compatible API",
+    "canonicalHost": "openrouter.ai",
+    "siteKind": "api_relay",
+    "recommendationLevel": "recommended",
+    "riskLevel": "medium",
+    "publicRate": 1.08,
+    "entryUrl": "https://openrouter.ai",
+    "apiBaseUrl": "https://openrouter.ai/api/v1",
+    "region": "Global",
+    "supports": ["Chat", "Tool Call", "Streaming", "Usage"],
+    "tags": ["router", "multi-model", "global"],
+    "baseline": {
+      "purityScore": 93,
+      "uptime24h": 99.4,
+      "firstTokenMs": 910,
+      "latestResponseMs": 910
+    },
+    "monitor": {
+      "enabled": true,
+      "kind": "openai",
+      "apiKeyEnv": "OPENROUTER_API_KEY",
+      "model": "openai/gpt-4o-mini"
+    },
+    "note": "Good OpenAI-compatible behavior; model/provider routing means purity depends on the selected upstream."
+  },
+  {
+    "slug": "deepinfra",
+    "name": "DeepInfra",
+    "summary": "Inference platform with OpenAI-compatible endpoints",
+    "canonicalHost": "api.deepinfra.com",
+    "siteKind": "developer_api",
+    "recommendationLevel": "neutral",
+    "riskLevel": "medium",
+    "publicRate": 0.95,
+    "entryUrl": "https://deepinfra.com",
+    "apiBaseUrl": "https://api.deepinfra.com/v1/openai",
+    "region": "Global",
+    "supports": ["Chat", "Streaming", "Usage"],
+    "tags": ["inference", "open-source-models", "global"],
+    "baseline": {
+      "purityScore": 88,
+      "uptime24h": 99.1,
+      "firstTokenMs": 780,
+      "latestResponseMs": 780
+    },
+    "monitor": {
+      "enabled": true,
+      "kind": "openai",
+      "apiKeyEnv": "DEEPINFRA_API_KEY",
+      "model": "meta-llama/Meta-Llama-3.1-8B-Instruct"
+    },
+    "note": "Strong compatibility for hosted open-source models; not a direct official OpenAI/Claude relay."
+  },
+  {
+    "slug": "together-ai",
+    "name": "Together AI",
+    "summary": "OpenAI-compatible inference API",
+    "canonicalHost": "api.together.xyz",
+    "siteKind": "developer_api",
+    "recommendationLevel": "neutral",
+    "riskLevel": "medium",
+    "publicRate": 0.92,
+    "entryUrl": "https://www.together.ai",
+    "apiBaseUrl": "https://api.together.xyz/v1",
+    "region": "Global",
+    "supports": ["Chat", "Tool Call", "Streaming", "Usage"],
+    "tags": ["inference", "open-source-models", "global"],
+    "baseline": {
+      "purityScore": 86,
+      "uptime24h": 98.9,
+      "firstTokenMs": 840,
+      "latestResponseMs": 840
+    },
+    "monitor": {
+      "enabled": true,
+      "kind": "openai",
+      "apiKeyEnv": "TOGETHER_API_KEY",
+      "model": "meta-llama/Llama-3.3-70B-Instruct-Turbo"
+    },
+    "note": "Useful as an OpenAI-compatible provider; model purity should be evaluated per selected model."
+  },
+  {
+    "slug": "siliconflow",
+    "name": "SiliconFlow",
+    "summary": "China-friendly OpenAI-compatible API platform",
+    "canonicalHost": "api.siliconflow.cn",
+    "siteKind": "developer_api",
+    "recommendationLevel": "neutral",
+    "riskLevel": "medium",
+    "publicRate": 0.88,
+    "entryUrl": "https://siliconflow.cn",
+    "apiBaseUrl": "https://api.siliconflow.cn/v1",
+    "region": "CN",
+    "supports": ["Chat", "Streaming", "Usage"],
+    "tags": ["cn", "open-source-models", "low-latency"],
+    "baseline": {
+      "purityScore": 84,
+      "uptime24h": 98.7,
+      "firstTokenMs": 720,
+      "latestResponseMs": 720
+    },
+    "monitor": {
+      "enabled": true,
+      "kind": "openai",
+      "apiKeyEnv": "SILICONFLOW_API_KEY",
+      "model": "Qwen/Qwen2.5-7B-Instruct"
+    },
+    "note": "Low-latency OpenAI-compatible platform in China; not intended as official OpenAI/Claude purity baseline."
+  },
+  {
+    "slug": "aihubmix",
+    "name": "AiHubMix",
+    "summary": "Multi-provider API relay",
+    "canonicalHost": "aihubmix.com",
+    "siteKind": "api_relay",
+    "recommendationLevel": "watch",
+    "riskLevel": "medium",
+    "publicRate": 1.2,
+    "entryUrl": "https://aihubmix.com",
+    "apiBaseUrl": "https://aihubmix.com/v1",
+    "region": "CN",
+    "supports": ["Chat", "Streaming", "Usage"],
+    "tags": ["relay", "cn", "multi-provider"],
+    "baseline": {
+      "purityScore": 82,
+      "uptime24h": 97.8,
+      "firstTokenMs": 1180,
+      "latestResponseMs": 1180
+    },
+    "monitor": {
+      "enabled": true,
+      "kind": "openai",
+      "apiKeyEnv": "AIHUBMIX_API_KEY",
+      "model": "gpt-4o-mini"
+    },
+    "note": "Relay-style platform; real score should be updated from your own probe results."
+  },
+  {
+    "slug": "302-ai",
+    "name": "302.AI",
+    "summary": "Aggregated AI API gateway",
+    "canonicalHost": "302.ai",
+    "siteKind": "api_relay",
+    "recommendationLevel": "watch",
+    "riskLevel": "medium",
+    "publicRate": 1.25,
+    "entryUrl": "https://302.ai",
+    "apiBaseUrl": "https://api.302.ai",
+    "region": "CN",
+    "supports": ["Chat", "Streaming", "Usage"],
+    "tags": ["relay", "gateway", "multi-provider"],
+    "baseline": {
+      "purityScore": 80,
+      "uptime24h": 97.4,
+      "firstTokenMs": 1250,
+      "latestResponseMs": 1250
+    },
+    "monitor": {
+      "enabled": true,
+      "kind": "openai",
+      "apiKeyEnv": "AI302_API_KEY",
+      "model": "gpt-4o-mini"
+    },
+    "note": "Aggregated gateway. Verify selected upstream model before production use."
+  },
+  {
+    "slug": "one-api-self-hosted",
+    "name": "One API / New API",
+    "summary": "Self-hosted API relay stack",
+    "canonicalHost": "your-one-api.example.com",
+    "siteKind": "self_hosted",
+    "recommendationLevel": "watch",
+    "riskLevel": "high",
+    "publicRate": 1.35,
+    "entryUrl": "https://github.com/songquanpeng/one-api",
+    "apiBaseUrl": "https://your-one-api.example.com/v1",
+    "region": "Self-hosted",
+    "supports": ["Chat", "Streaming", "Usage"],
+    "tags": ["self-hosted", "gateway", "open-source"],
+    "baseline": {
+      "purityScore": 76,
+      "uptime24h": 96.5,
+      "firstTokenMs": 1500,
+      "latestResponseMs": 1500
+    },
+    "monitor": {
+      "enabled": false,
+      "kind": "openai",
+      "apiKeyEnv": "ONE_API_KEY",
+      "model": "gpt-4o-mini"
+    },
+    "note": "Score varies by deployment, channel config and upstream provider."
+  }
+]
