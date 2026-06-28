@@ -172,10 +172,10 @@ function renderPeople() {
     <section class="page-head">
       <div>
         <p class="eyebrow">People</p>
-        <h1 id="people-title">人物图鉴</h1>
-        <p>先记录公开身份、联系方式和关联站点。资料少也没关系，关键是可认领、可纠错、可持续补充。</p>
+        <h1 id="people-title">中转生态人物图鉴</h1>
+        <p>从人物进入中转生态：谁在维护项目，谁在运营站点，谁提供检测与判断依据。这里只整理公开线索，并保留认领与纠错入口。</p>
       </div>
-      ${localSearch("搜索人物、微信、GitHub、站点名")}
+      ${localSearch("搜索人物、身份、微信、GitHub、站点名")}
     </section>
     <div class="person-grid">
       ${people.map(personCard).join("") || emptyState("没有匹配的人物。")}
@@ -567,22 +567,49 @@ function featuredWechat(contact) {
 
 function personCard(person) {
   const site = findSite(person.siteId);
+  const contacts = (person.contacts || []).filter((contact) => contact.type !== "wechat").slice(0, 2);
+  const wechat = (person.contacts || []).find((contact) => contact.type === "wechat");
+  const reason =
+    person.featureAchievement ||
+    person.featureReason ||
+    person.highlight ||
+    person.bio ||
+    "公开线索待补充，当前作为中转生态人物条目记录。";
+  const proofTags = (person.featureTags || person.tags || person.identities || []).slice(0, 4);
   return `
-    <article class="person-card">
-      <div class="person-line">
-        <div class="avatar">${escapeHtml(person.avatarText || person.name.slice(0, 1))}</div>
-        <div>
-          <h3>${escapeHtml(person.name)}</h3>
-          <p>${escapeHtml(person.subtitle || person.title)}</p>
+    <article class="person-card" data-detail="${escapeAttribute(person.id)}">
+      <div class="person-card-head">
+        <div class="featured-avatar-wrap person-avatar-wrap ${wechat ? "featured-wechat" : ""}" ${wechat ? `aria-label="微信 ${escapeAttribute(wechat.value || wechat.label || "待补充")}" tabindex="0"` : ""}>
+          <div class="avatar featured-avatar person-avatar">${escapeHtml(person.avatarText || person.name.slice(0, 1))}</div>
+          ${wechat ? featuredWechat(wechat) : ""}
+        </div>
+        <div class="person-card-title">
+          <div class="person-name-row">
+            <h3>${escapeHtml(person.name)}</h3>
+            ${pill(person.title || person.tags?.[0] || "公开人物", "gold")}
+          </div>
+          ${
+            site
+              ? `<a class="person-site-link" href="${escapeAttribute(site.entryUrl || "#")}" target="_blank" rel="noreferrer">关联站点 ${escapeHtml(site.name)} <span aria-hidden="true">↗</span></a>`
+              : `<p class="person-site-missing">关联站点待补充</p>`
+          }
         </div>
       </div>
-      <div class="tag-row">${(person.tags || []).map((tag) => pill(tag, "neutral")).join("")}</div>
-      <dl>
-        <div><dt>公开身份</dt><dd>${escapeHtml((person.identities || []).slice(0, 2).join(" / ") || "待补充")}</dd></div>
-        <div><dt>联系方式</dt><dd>${escapeHtml((person.contacts || []).length ? `${person.contacts.length} 个公开联系方式` : "待补充")}</dd></div>
-        <div><dt>关联站点</dt><dd>${escapeHtml(site?.name || "暂无")}</dd></div>
-      </dl>
-      <button class="secondary-button compact" data-detail="${escapeAttribute(person.id)}" type="button">查看人物与站点</button>
+      <div class="person-reason">
+        <span>收录理由</span>
+        <p>${escapeHtml(reason)}</p>
+      </div>
+      <div class="person-proof">${proofTags.map((tag) => `<span>${escapeHtml(tag)}</span>`).join("")}</div>
+      <div class="person-card-meta">
+        <div class="person-contact-strip">
+          ${contacts.length ? contacts.map(contactBadge).join("") : `<span class="person-muted">联系方式待补充</span>`}
+        </div>
+        <div class="person-status-strip">
+          ${pill(site?.modelStatus || "状态待测", site?.modelStatus === "在线" ? "good" : "warn")}
+          ${pill(site ? `稳定性 ${site.uptime24h}%` : "稳定性待测", Number(site?.uptime24h || 0) >= 98 ? "good" : "warn")}
+        </div>
+        <button class="text-button person-detail-link" data-detail="${escapeAttribute(person.id)}" type="button">查看档案</button>
+      </div>
     </article>
   `;
 }
@@ -815,7 +842,8 @@ function filterPeople(people) {
   if (!query) return people;
   return people.filter((person) => {
     const site = findSite(person.siteId);
-    return [person.name, person.title, person.subtitle, person.bio, site?.name, site?.domain, ...(person.tags || [])]
+    const contacts = (person.contacts || []).flatMap((contact) => [contact.type, contact.label, contact.value]);
+    return [person.name, person.title, person.subtitle, person.bio, site?.name, site?.domain, ...(person.tags || []), ...contacts]
       .join(" ")
       .toLowerCase()
       .includes(query);
