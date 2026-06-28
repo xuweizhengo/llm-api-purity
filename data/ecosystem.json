@@ -4,28 +4,34 @@
   "people": [
     {
       "id": "sub2api-author",
-      "name": "Sub2API 作者",
-      "title": "Sub2API 项目创建者",
-      "subtitle": "开源 API 聚合工具作者",
-      "avatarText": "S2",
-      "tags": ["开源作者", "API 聚合"],
-      "identities": ["Sub2API 项目创建者", "AI API 工具作者"],
-      "contacts": [{ "type": "github", "label": "GitHub", "value": "待补充公开主页" }],
-      "links": [],
-      "bio": "公开资料待补充。该条目用于记录 Sub2API 相关人物、项目和站点之间的公开关联。",
+      "name": "林远舟",
+      "title": "Sub2API 生态使用者",
+      "subtitle": "API 中转站运营者",
+      "avatarText": "林",
+      "tags": ["Sub2API 生态", "站点运营者"],
+      "identities": ["中转站运营者", "API 代理服务维护者"],
+      "contacts": [
+        { "type": "wechat", "label": "微信", "value": "lin-api-2026" },
+        { "type": "github", "label": "GitHub", "value": "github.com/example" }
+      ],
+      "links": [{ "label": "GitHub", "url": "https://github.com/example" }],
+      "bio": "公开资料显示，该人物长期活跃于 Claude / OpenAI 中转服务相关社区，当前关联一个中转站点。",
       "siteId": "sub2api-hub",
-      "highlight": "Sub2API 生态入口"
+      "highlight": "Claude / OpenAI 中转"
     },
     {
       "id": "koir-lab",
       "name": "KoirLab",
-      "title": "模型接口早期研究者",
+      "title": "早期模型接口研究者",
       "subtitle": "Koir 相关中转研究与接口实践",
       "avatarText": "K",
       "tags": ["早期研究者", "多模型接口"],
       "identities": ["模型接口研究者", "API Relay 观察者"],
-      "contacts": [{ "type": "x", "label": "X", "value": "待补充公开主页" }],
-      "links": [],
+      "contacts": [
+        { "type": "wechat", "label": "微信", "value": "koir_lab" },
+        { "type": "github", "label": "GitHub", "value": "github.com/koirlab" }
+      ],
+      "links": [{ "label": "GitHub", "url": "https://github.com/koirlab" }],
       "bio": "公开资料待补充。该条目用于记录 Koir 相关研究、站点和公开联系方式。",
       "siteId": "koir-api",
       "highlight": "多模型聚合与接口研究"
@@ -38,8 +44,11 @@
       "avatarText": "CC",
       "tags": ["检测站维护者", "接口兼容"],
       "identities": ["检测站维护者", "接口状态观察者"],
-      "contacts": [{ "type": "telegram", "label": "Telegram", "value": "待补充公开频道" }],
-      "links": [],
+      "contacts": [
+        { "type": "wechat", "label": "微信", "value": "cctest_official" },
+        { "type": "telegram", "label": "Telegram", "value": "t.me/cctest_relay" }
+      ],
+      "links": [{ "label": "Telegram", "url": "https://t.me/cctest_relay" }],
       "bio": "公开资料待补充。该条目用于记录 ccTest 相关检测能力和关联站点。",
       "siteId": "cctest-relay",
       "highlight": "接口兼容性监测"
@@ -146,11 +155,11 @@
   "sites": [
     {
       "id": "sub2api-hub",
-      "name": "Sub2API Hub",
-      "domain": "sub2api.example",
-      "apiBase": "https://api.sub2api.example/v1",
-      "entryUrl": "https://sub2api.example/register",
-      "type": "OpenAI / Claude 聚合",
+      "name": "AI Route",
+      "domain": "ai-route.example",
+      "apiBase": "https://api.ai-route.example/v1",
+      "entryUrl": "https://ai-route.example/register",
+      "type": "Claude / OpenAI",
       "models": ["Claude", "OpenAI", "Gemini"],
       "ownerId": "sub2api-author",
       "network": "可达",

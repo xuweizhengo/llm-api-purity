@@ -120,53 +120,41 @@ function renderHome() {
   roots.home.innerHTML = `
     <section class="hero-shell">
       <div class="hero-copy">
-        <p class="eyebrow">AI API Relay People Atlas</p>
         <h1 id="home-title">先看人，再选中转站</h1>
         <p>不是收录最多的中转站，而是帮你看清每个站背后的人。</p>
         <div class="hero-actions">
           <button class="primary-button" data-route="people" type="button">查看人物图鉴</button>
           <button class="secondary-button" data-route="sites" type="button">查看站点目录</button>
         </div>
-        <p class="trust-note">仅收录公开信息与站点自愿提交信息，支持本人认领、纠错与下架申请。</p>
-      </div>
-      <div class="hero-panel">
-        <span>当前收录</span>
-        <strong>${people.length}</strong>
-        <p>人物线索</p>
-        <div class="mini-stats">
-          <div><b>${sites.length}</b><span>关联站点</span></div>
-          <div><b>${state.ranking?.stats?.total || 0}</b><span>公开目录</span></div>
-        </div>
+        <p class="trust-note"><span class="trust-icon" aria-hidden="true">◇</span>仅收录公开信息与站点自愿提交信息，支持本人认领、纠错与下架申请。</p>
       </div>
     </section>
 
     <section class="value-grid">
-      ${valueCard("背后是谁", "公开昵称、微信头像、GitHub、X、Telegram、微信。")}
-      ${valueCard("有什么特点", "开源作者、早期研究者、站点运营者、号池玩家。")}
-      ${valueCard("现在稳不稳", "网络可达、模型在线、首帧速度、24h 稳定性。")}
+      ${valueCard("背后是谁", "公开昵称、微信头像、GitHub、X、Telegram、微信。", "person")}
+      ${valueCard("有什么特点", "开源作者、早期研究者、站点运营者、号池玩家。", "star")}
+      ${valueCard("现在稳不稳", "网络可达、模型在线、首帧速度、24h 稳定性。", "shield")}
     </section>
 
-    <section class="section-head">
+    <section class="section-head home-section-head">
       <div>
-        <p class="eyebrow">Curated</p>
         <h2>本周精选人物与站点</h2>
       </div>
-      <button class="text-button" data-route="people" type="button">查看全部人物</button>
+      <button class="text-button arrow-link" data-route="people" type="button">查看全部精选</button>
     </section>
     <div class="featured-grid">
       ${featuredPeople.map(featuredCard).join("")}
     </div>
 
-    <section class="section-head">
+    <section class="section-head home-section-head">
       <div>
-        <p class="eyebrow">Directory</p>
         <h2>收录站点</h2>
       </div>
-      <button class="text-button" data-route="sites" type="button">进入站点目录</button>
     </section>
-    ${siteTable(sites.slice(0, 10), { compact: true })}
+    ${siteTable(sites.slice(0, 10), { compact: true, numbered: true })}
 
     <section class="submit-band">
+      <div class="submit-band-icon" aria-hidden="true">人</div>
       <div>
         <h2>知道某个站背后的人？</h2>
         <p>提交公开线索，帮助补全中转生态人物图鉴。</p>
@@ -473,36 +461,67 @@ function processSteps(tab) {
   ];
 }
 
-function valueCard(title, text) {
+function valueCard(title, text, icon) {
   return `
     <article class="value-card">
-      <span></span>
-      <h3>${escapeHtml(title)}</h3>
-      <p>${escapeHtml(text)}</p>
+      <div class="value-icon ${escapeAttribute(icon)}">${valueIcon(icon)}</div>
+      <div>
+        <h3>${escapeHtml(title)}</h3>
+        <p>${escapeHtml(text)}</p>
+      </div>
     </article>
   `;
 }
 
+function valueIcon(icon) {
+  return {
+    person: "人",
+    star: "☆",
+    shield: "盾"
+  }[icon] || "•";
+}
+
+function contactBadge(contact) {
+  return `
+    <span class="contact-badge">
+      <b>${escapeHtml(contactIcon(contact.type))}</b>
+      ${escapeHtml(contact.value || contact.label || "待补充")}
+    </span>
+  `;
+}
+
+function contactIcon(type) {
+  return {
+    wechat: "微",
+    github: "G",
+    telegram: "T",
+    email: "@",
+    x: "X"
+  }[type] || "链";
+}
+
 function featuredCard(person) {
   const site = findSite(person.siteId);
+  const contacts = (person.contacts || []).slice(0, 2);
   return `
-    <article class="featured-card">
-      <div class="person-line">
+    <article class="featured-card" data-detail="${escapeAttribute(person.id)}">
+      <div class="featured-main">
         <div class="avatar">${escapeHtml(person.avatarText || person.name.slice(0, 1))}</div>
-        <div>
+        <div class="featured-info">
           <h3>${escapeHtml(person.name)}</h3>
-          <p>${escapeHtml(person.title)}</p>
+          ${pill(person.tags?.[0] || person.title, "gold")}
+          <span>运营站点</span>
+          <strong>${escapeHtml(site?.name || "暂无关联站点")}</strong>
+          <p>${escapeHtml(site?.type || person.highlight || "")}</p>
+        </div>
+        <div class="featured-contacts">
+          ${contacts.length ? contacts.map(contactBadge).join("") : `<span class="contact-badge">待补充公开联系方式</span>`}
         </div>
       </div>
-      <div class="card-body">
-        <strong>${escapeHtml(site?.name || "暂无关联站点")}</strong>
-        <span>${escapeHtml(person.highlight || site?.type || "")}</span>
-      </div>
-      <div class="tag-row">
+      <div class="featured-status">
         ${pill(site?.modelStatus || "待补充", site?.modelStatus === "在线" ? "good" : "warn")}
-        ${pill(site ? `首帧 ${site.firstTokenMs}ms` : "首帧待测", "neutral")}
+        ${pill(site ? `首帧 ${site.firstTokenMs}ms` : "首帧待测", "gold")}
       </div>
-      <button class="text-button" data-detail="${escapeAttribute(person.id)}" type="button">查看详情</button>
     </article>
   `;
 }
@@ -529,13 +548,14 @@ function personCard(person) {
   `;
 }
 
-function siteTable(sites, { compact }) {
+function siteTable(sites, { compact, numbered = false } = {}) {
   if (!sites.length) return emptyState("没有匹配的站点。");
   return `
     <div class="table-wrap ${compact ? "compact" : ""}">
       <table>
         <thead>
           <tr>
+            ${numbered ? "<th>#</th>" : ""}
             <th>站点</th>
             <th>背后人物</th>
             <th>支持模型</th>
@@ -547,24 +567,26 @@ function siteTable(sites, { compact }) {
           </tr>
         </thead>
         <tbody>
-          ${sites.map(siteRow).join("")}
+          ${sites.map((site, index) => siteRow(site, index, numbered)).join("")}
         </tbody>
       </table>
     </div>
   `;
 }
 
-function siteRow(site) {
+function siteRow(site, index = 0, numbered = false) {
   const owner = findPerson(site.ownerId);
+  const contact = owner?.contacts?.[0];
   return `
     <tr>
+      ${numbered ? `<td>${index + 1}</td>` : ""}
       <td>
         <strong>${escapeHtml(site.name)}</strong>
         <span>${escapeHtml(site.domain)}</span>
       </td>
       <td>${escapeHtml(owner?.name || "待认领")}</td>
       <td>${escapeHtml((site.models || []).join(" / "))}</td>
-      <td>${escapeHtml(owner?.contacts?.length ? `${owner.contacts.length} 个` : "待补充")}</td>
+      <td>${contact ? contactBadge(contact) : "待补充"}</td>
       <td>${pill(site.network || "待测", site.network === "可达" ? "good" : "warn")}</td>
       <td>${escapeHtml(site.firstTokenMs ? `${site.firstTokenMs}ms` : "--")}</td>
       <td>${escapeHtml(site.uptime24h ? `${site.uptime24h}%` : "--")}</td>

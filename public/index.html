@@ -14,15 +14,12 @@
   <body>
     <header class="topbar">
       <a class="brand" href="#home" aria-label="中转生态人物图鉴">
-        <span class="brand-mark" aria-hidden="true">人</span>
         <span>
           <strong>中转生态人物图鉴</strong>
-          <small>AI API Relay People Atlas</small>
         </span>
       </a>
 
       <nav class="nav" aria-label="主导航">
-        <button class="nav-link active" data-route="home" type="button">首页</button>
         <button class="nav-link" data-route="people" type="button">人物</button>
         <button class="nav-link" data-route="sites" type="button">站点</button>
         <button class="nav-link" data-route="submit/person" type="button">提交线索</button>
@@ -32,6 +29,7 @@
         <label class="quick-search">
           <span class="sr-only">快速查证</span>
           <input id="global-search" placeholder="查微信号 / 域名" />
+          <span class="search-icon" aria-hidden="true">⌕</span>
         </label>
         <button class="text-link" data-route="submit/claim" type="button">认领 / 纠错</button>
       </div>
