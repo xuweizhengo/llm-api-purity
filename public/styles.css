@@ -397,29 +397,30 @@ dt {
 
 .value-grid {
   grid-template-columns: repeat(3, 1fr);
-  margin: 14px auto 20px;
+  gap: 14px;
+  margin: 12px auto 16px;
 }
 
 .value-card {
   display: grid;
-  grid-template-columns: 78px 1fr;
+  grid-template-columns: 52px 1fr;
   align-items: center;
-  gap: 20px;
-  min-height: 96px;
-  padding: 16px 28px;
+  gap: 14px;
+  min-height: 78px;
+  padding: 12px 18px;
   box-shadow: none;
 }
 
 .value-icon {
   display: grid;
   place-items: center;
-  width: 58px;
-  height: 58px;
+  width: 42px;
+  height: 42px;
   border: 1px solid #bd8618;
   border-radius: 8px;
   color: #ad760e;
   font-family: Georgia, "Times New Roman", "Songti SC", "SimSun", serif;
-  font-size: 28px;
+  font-size: 21px;
   font-weight: 900;
 }
 
@@ -434,7 +435,7 @@ dt {
 
 .value-card h3 {
   font-family: Georgia, "Times New Roman", "Songti SC", "SimSun", serif;
-  font-size: 22px;
+  font-size: 19px;
 }
 
 .value-card p,
@@ -447,7 +448,9 @@ dt {
 }
 
 .value-card p {
-  margin: 8px 0 0;
+  margin: 5px 0 0;
+  font-size: 13px;
+  line-height: 1.55;
 }
 
 .section-head,
