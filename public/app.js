@@ -503,6 +503,7 @@ function contactIcon(type) {
 function featuredCard(person) {
   const site = findSite(person.siteId);
   const contacts = (person.contacts || []).slice(0, 2);
+  const reason = person.featureReason || site?.characteristics?.[0] || person.subtitle || person.highlight || "";
   return `
     <article class="featured-card" data-detail="${escapeAttribute(person.id)}">
       <div class="featured-main">
@@ -514,7 +515,8 @@ function featuredCard(person) {
           </div>
           <span>运营站点</span>
           <strong>${escapeHtml(site?.name || "暂无关联站点")}</strong>
-          <p>${escapeHtml(site?.type || person.highlight || "")}</p>
+          <p class="featured-site-type">${escapeHtml(site?.type || person.highlight || "")}</p>
+          ${reason ? `<p class="featured-reason"><b>入选理由</b>${escapeHtml(reason)}</p>` : ""}
         </div>
         <div class="featured-contacts">
           ${contacts.length ? contacts.map(contactBadge).join("") : `<span class="contact-badge">待补充公开联系方式</span>`}

@@ -17,7 +17,8 @@
       "links": [{ "label": "GitHub", "url": "https://github.com/example" }],
       "bio": "公开资料显示，该人物长期活跃于 Claude / OpenAI 中转服务相关社区，当前关联一个中转站点。",
       "siteId": "sub2api-hub",
-      "highlight": "Claude / OpenAI 中转"
+      "highlight": "Claude / OpenAI 中转",
+      "featureReason": "Sub2API 生态入口，适合作为中转样本。"
     },
     {
       "id": "koir-lab",
@@ -34,7 +35,8 @@
       "links": [{ "label": "GitHub", "url": "https://github.com/koirlab" }],
       "bio": "公开资料待补充。该条目用于记录 Koir 相关研究、站点和公开联系方式。",
       "siteId": "koir-api",
-      "highlight": "多模型聚合与接口研究"
+      "highlight": "多模型聚合与接口研究",
+      "featureReason": "早期多模型聚合实践，代表技术型线索。"
     },
     {
       "id": "cctest-maintainer",
@@ -51,7 +53,8 @@
       "links": [{ "label": "Telegram", "url": "https://t.me/cctest_relay" }],
       "bio": "公开资料待补充。该条目用于记录 ccTest 相关检测能力和关联站点。",
       "siteId": "cctest-relay",
-      "highlight": "接口兼容性监测"
+      "highlight": "接口兼容性监测",
+      "featureReason": "兼容性检测与状态观察，补足稳定性判断。"
     },
     {
       "id": "btc193",
