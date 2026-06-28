@@ -1,0 +1,47 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-relay_atlas}
+      POSTGRES_USER: ${POSTGRES_USER:-relay_atlas}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-relay_atlas_password}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-relay_atlas} -d ${POSTGRES_DB:-relay_atlas}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PORT: 3078
+      DATABASE_URL: postgres://${POSTGRES_USER:-relay_atlas}:${POSTGRES_PASSWORD:-relay_atlas_password}@db:5432/${POSTGRES_DB:-relay_atlas}
+      DB_SEED_ON_START: ${DB_SEED_ON_START:-true}
+      REQUEST_TIMEOUT_MS: ${REQUEST_TIMEOUT_MS:-45000}
+      MONITOR_INTERVAL_MS: ${MONITOR_INTERVAL_MS:-86400000}
+      MONITOR_ON_START: ${MONITOR_ON_START:-true}
+      MONITOR_DEEP_CHECKS: ${MONITOR_DEEP_CHECKS:-false}
+      RANKING_ADMIN_TOKEN: ${RANKING_ADMIN_TOKEN:-change-me-local-token}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+    ports:
+      - "${APP_PORT:-3078}:3078"
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "node -e \"fetch('http://127.0.0.1:3078/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\""
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres-data:

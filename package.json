@@ -8,7 +8,7 @@
     "start": "node server.js",
     "dev": "node --watch server.js",
     "import:proxyai": "node scripts/import-proxyai-sites.mjs",
-    "check": "node --check server.js && node --check public/app.js"
+    "check": "node --check server.js && node --check src/store.js && node --check public/app.js"
   },
   "keywords": [
     "llm",
@@ -26,5 +26,8 @@
   "license": "MIT",
   "engines": {
     "node": ">=20"
+  },
+  "dependencies": {
+    "pg": "^8.22.0"
   }
 }

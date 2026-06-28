@@ -3,6 +3,16 @@ import { createHash, randomBytes } from "node:crypto";
 import { appendFile, mkdir, readFile, stat, writeFile } from "node:fs/promises";
 import { extname, join, normalize } from "node:path";
 import { fileURLToPath } from "node:url";
+import {
+  closeDatabase,
+  initializeDatabase,
+  isDatabaseEnabled,
+  loadEcosystemFromDb,
+  loadMonitorResultsFromDb,
+  loadRankingSitesFromDb,
+  saveLeadToDb,
+  saveMonitorResultToDb
+} from "./src/store.js";
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const PUBLIC_DIR = join(__dirname, "public");
@@ -11,9 +21,10 @@ const RANKING_SITES_FILE = join(DATA_DIR, "sites.json");
 const RANKING_RESULTS_FILE = join(DATA_DIR, "monitor-results.json");
 const ECOSYSTEM_FILE = join(DATA_DIR, "ecosystem.json");
 const LEADS_FILE = join(DATA_DIR, "submitted-leads.jsonl");
+const DB_SCHEMA_FILE = join(__dirname, "db", "schema.sql");
 const PORT = Number.parseInt(process.env.PORT || "3078", 10);
 const REQUEST_TIMEOUT_MS = Number.parseInt(process.env.REQUEST_TIMEOUT_MS || "45000", 10);
-const MONITOR_INTERVAL_MS = Number.parseInt(process.env.MONITOR_INTERVAL_MS || "1800000", 10);
+const MONITOR_INTERVAL_MS = Number.parseInt(process.env.MONITOR_INTERVAL_MS || "86400000", 10);
 const MONITOR_ON_START = process.env.MONITOR_ON_START === "true";
 const MONITOR_DEEP_CHECKS = process.env.MONITOR_DEEP_CHECKS === "true";
 const MAX_BODY_BYTES = 32 * 1024;
@@ -60,6 +71,19 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
+    if (req.method === "GET" && requestUrl.pathname === "/api/health") {
+      sendJson(res, 200, {
+        ok: true,
+        datastore: isDatabaseEnabled() ? "postgres" : "json-files",
+        monitor: {
+          running: monitorRunning,
+          intervalMs: MONITOR_INTERVAL_MS,
+          deepChecks: MONITOR_DEEP_CHECKS
+        }
+      });
+      return;
+    }
+
     if (req.method === "GET" && requestUrl.pathname === "/api/ranking") {
       const ranking = await loadRanking();
       sendJson(res, 200, ranking);
@@ -102,10 +126,35 @@ const server = http.createServer(async (req, res) => {
   }
 });
 
-server.listen(PORT, () => {
-  console.log(`AI Relay People Atlas is running at http://localhost:${PORT}`);
-  startRankingMonitor();
-});
+await bootstrap();
+
+async function bootstrap() {
+  try {
+    const databaseReady = await initializeDatabase({
+      schemaFile: DB_SCHEMA_FILE,
+      ecosystemFile: ECOSYSTEM_FILE,
+      rankingSitesFile: RANKING_SITES_FILE
+    });
+
+    server.listen(PORT, () => {
+      console.log(`AI Relay People Atlas is running at http://localhost:${PORT}`);
+      console.log(`Data store: ${databaseReady ? "postgres" : "json-files"}`);
+      startRankingMonitor();
+    });
+  } catch (error) {
+    console.error("failed to start server:", sanitizeError(error));
+    process.exitCode = 1;
+  }
+}
+
+process.on("SIGINT", shutdown);
+process.on("SIGTERM", shutdown);
+
+async function shutdown() {
+  if (monitorTimer) clearInterval(monitorTimer);
+  await closeDatabase().catch(() => {});
+  server.close(() => process.exit(0));
+}
 
 async function runPurityCheck(input) {
   const startedAt = Date.now();
@@ -958,6 +1007,27 @@ async function loadRanking() {
     provider.rank = index + 1;
   });
 
+  if (!providers.length) {
+    rankingCache = {
+      updatedAt: null,
+      source: isDatabaseEnabled() ? "database" : "backend-config",
+      monitor: {
+        intervalMs: MONITOR_INTERVAL_MS,
+        deepChecks: MONITOR_DEEP_CHECKS,
+        running: monitorRunning,
+        nextRunHint: MONITOR_INTERVAL_MS > 0 ? "scheduled" : "disabled"
+      },
+      stats: {
+        total: 0,
+        stable: 0,
+        avgPurity: 0,
+        avgFirstToken: 0
+      },
+      providers: []
+    };
+    return rankingCache;
+  }
+
   const stable = providers.filter((provider) => provider.available).length;
   const avgPurity = round(providers.reduce((sum, provider) => sum + Number(provider.purityScore || 0), 0) / providers.length, 1);
   const avgFirstToken = Math.round(providers.reduce((sum, provider) => sum + Number(provider.firstTokenMs || 0), 0) / providers.length);
@@ -1021,6 +1091,7 @@ async function runRankingMonitor({ force = false } = {}) {
   if (monitorRunning && !force) return;
   monitorRunning = true;
   try {
+    const databaseMode = isDatabaseEnabled();
     const sites = await readSites();
     const previous = await readMonitorResults();
     const next = {
@@ -1036,10 +1107,13 @@ async function runRankingMonitor({ force = false } = {}) {
         continue;
       }
       next.sites[site.slug] = await monitorSite(site, next.sites[site.slug]);
+      if (databaseMode) await saveMonitorResultToDb(site.slug, next.sites[site.slug]);
     }
 
-    await mkdir(DATA_DIR, { recursive: true });
-    await writeFile(RANKING_RESULTS_FILE, JSON.stringify(next, null, 2), "utf8");
+    if (!databaseMode) {
+      await mkdir(DATA_DIR, { recursive: true });
+      await writeFile(RANKING_RESULTS_FILE, JSON.stringify(next, null, 2), "utf8");
+    }
     rankingCache = null;
   } finally {
     monitorRunning = false;
@@ -1218,10 +1292,12 @@ function buildSkippedMonitorResult(site, previous = {}) {
 }
 
 async function readSites() {
+  if (isDatabaseEnabled()) return loadRankingSitesFromDb();
   return JSON.parse(await readFile(RANKING_SITES_FILE, "utf8"));
 }
 
 async function readMonitorResults() {
+  if (isDatabaseEnabled()) return loadMonitorResultsFromDb();
   try {
     return JSON.parse(await readFile(RANKING_RESULTS_FILE, "utf8"));
   } catch {
@@ -1230,6 +1306,7 @@ async function readMonitorResults() {
 }
 
 async function loadEcosystem() {
+  if (isDatabaseEnabled()) return loadEcosystemFromDb();
   try {
     return JSON.parse(await readFile(ECOSYSTEM_FILE, "utf8"));
   } catch {
@@ -1256,6 +1333,10 @@ async function saveLead(input, req) {
     userAgent: pickString(req.headers["user-agent"], 240),
     payload: sanitizeLeadPayload(input.payload || {})
   };
+
+  if (isDatabaseEnabled()) {
+    return saveLeadToDb(lead);
+  }
 
   await mkdir(DATA_DIR, { recursive: true });
   await appendFile(LEADS_FILE, `${JSON.stringify(lead)}\n`, "utf8");
