@@ -47,6 +47,8 @@ function bindGlobalEvents() {
 
     const detailButton = event.target.closest("[data-detail]");
     if (detailButton) {
+      const interactive = event.target.closest("a, button, input, select, textarea, .featured-wechat");
+      if (interactive && interactive !== detailButton) return;
       event.preventDefault();
       navigate(`detail/${detailButton.dataset.detail}`);
     }
@@ -503,6 +505,7 @@ function contactIcon(type) {
 function featuredCard(person) {
   const site = findSite(person.siteId);
   const contacts = (person.contacts || []).slice(0, 2);
+  const wechat = (person.contacts || []).find((contact) => contact.type === "wechat");
   const achievement = person.featureAchievement || person.featureReason || person.subtitle || person.highlight || "";
   const proofTags = (person.featureTags || person.tags || []).slice(0, 4);
   return `
@@ -513,8 +516,9 @@ function featuredCard(person) {
           <div class="featured-name">
             <h3>${escapeHtml(person.name)}</h3>
             ${pill(person.title || person.tags?.[0] || "公开人物", "gold")}
+            ${wechat ? featuredWechat(wechat) : ""}
           </div>
-          <p class="featured-identity">${escapeHtml(person.subtitle || person.identities?.[0] || person.highlight || "")}</p>
+          ${site ? `<a class="featured-site-link" href="${escapeAttribute(site.entryUrl || "#")}" target="_blank" rel="noreferrer">关联站点 ${escapeHtml(site.name)} <span aria-hidden="true">↗</span></a>` : `<p class="featured-identity">关联站点待补充</p>`}
         </div>
       </div>
       <div class="featured-achievement">
@@ -527,12 +531,24 @@ function featuredCard(person) {
           ${contacts.length ? contacts.map(contactBadge).join("") : `<span class="contact-badge">待补充公开联系方式</span>`}
         </div>
         <div class="featured-site-meta">
-          <span><b>关联站点</b>${escapeHtml(site?.name || "待补充")}</span>
           <span>${escapeHtml(site?.modelStatus || "待测")}</span>
           <span>${escapeHtml(site ? `稳定性 ${site.uptime24h}%` : "稳定性待测")}</span>
         </div>
       </div>
     </article>
+  `;
+}
+
+function featuredWechat(contact) {
+  const value = contact.value || contact.label || "待补充";
+  return `
+    <span class="featured-wechat" aria-label="微信 ${escapeAttribute(value)}" tabindex="0">
+      <span class="wechat-button" aria-hidden="true">微</span>
+      <span class="wechat-popover">
+        <span class="qr-placeholder" aria-hidden="true"></span>
+        <span><b>微信</b>${escapeHtml(value)}</span>
+      </span>
+    </span>
   `;
 }
 
