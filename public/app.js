@@ -508,8 +508,10 @@ function featuredCard(person) {
       <div class="featured-main">
         <div class="avatar">${escapeHtml(person.avatarText || person.name.slice(0, 1))}</div>
         <div class="featured-info">
-          <h3>${escapeHtml(person.name)}</h3>
-          ${pill(person.tags?.[0] || person.title, "gold")}
+          <div class="featured-name">
+            <h3>${escapeHtml(person.name)}</h3>
+            ${pill(person.tags?.[0] || person.title, "gold")}
+          </div>
           <span>运营站点</span>
           <strong>${escapeHtml(site?.name || "暂无关联站点")}</strong>
           <p>${escapeHtml(site?.type || person.highlight || "")}</p>
@@ -521,6 +523,7 @@ function featuredCard(person) {
       <div class="featured-status">
         ${pill(site?.modelStatus || "待补充", site?.modelStatus === "在线" ? "good" : "warn")}
         ${pill(site ? `首帧 ${site.firstTokenMs}ms` : "首帧待测", "gold")}
+        ${pill(site ? `稳定性 ${site.uptime24h}%` : "稳定性待测", "good")}
       </div>
     </article>
   `;
