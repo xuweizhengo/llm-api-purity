@@ -621,13 +621,13 @@ dt {
 .featured-contacts {
   display: grid;
   grid-column: 3;
-  grid-row: 3 / 5;
+  grid-row: 2 / 5;
   gap: 7px;
   border-left: 1px solid var(--line);
-  min-height: 46px;
-  align-content: end;
+  min-height: 58px;
+  align-content: start;
   min-width: 0;
-  padding: 0 0 0 14px;
+  padding: 8px 0 0 14px;
 }
 
 .contact-badge {
