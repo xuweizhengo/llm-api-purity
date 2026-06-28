@@ -504,19 +504,21 @@ function contactIcon(type) {
 
 function featuredCard(person) {
   const site = findSite(person.siteId);
-  const contacts = (person.contacts || []).slice(0, 2);
+  const contacts = (person.contacts || []).filter((contact) => contact.type !== "wechat").slice(0, 2);
   const wechat = (person.contacts || []).find((contact) => contact.type === "wechat");
   const achievement = person.featureAchievement || person.featureReason || person.subtitle || person.highlight || "";
   const proofTags = (person.featureTags || person.tags || []).slice(0, 4);
   return `
     <article class="featured-card" data-detail="${escapeAttribute(person.id)}">
       <div class="featured-main">
-        <div class="avatar featured-avatar">${escapeHtml(person.avatarText || person.name.slice(0, 1))}</div>
+        <div class="featured-avatar-wrap ${wechat ? "featured-wechat" : ""}" ${wechat ? `aria-label="微信 ${escapeAttribute(wechat.value || wechat.label || "待补充")}" tabindex="0"` : ""}>
+          <div class="avatar featured-avatar">${escapeHtml(person.avatarText || person.name.slice(0, 1))}</div>
+          ${wechat ? featuredWechat(wechat) : ""}
+        </div>
         <div class="featured-info">
           <div class="featured-name">
             <h3>${escapeHtml(person.name)}</h3>
             ${pill(person.title || person.tags?.[0] || "公开人物", "gold")}
-            ${wechat ? featuredWechat(wechat) : ""}
           </div>
           ${site ? `<a class="featured-site-link" href="${escapeAttribute(site.entryUrl || "#")}" target="_blank" rel="noreferrer">关联站点 ${escapeHtml(site.name)} <span aria-hidden="true">↗</span></a>` : `<p class="featured-identity">关联站点待补充</p>`}
         </div>
@@ -527,9 +529,7 @@ function featuredCard(person) {
       </div>
       <div class="featured-proof">${proofTags.map((tag) => `<span>${escapeHtml(tag)}</span>`).join("")}</div>
       <div class="featured-meta">
-        <div class="featured-contacts">
-          ${contacts.length ? contacts.map(contactBadge).join("") : `<span class="contact-badge">待补充公开联系方式</span>`}
-        </div>
+        ${contacts.length ? `<div class="featured-contacts">${contacts.map(contactBadge).join("")}</div>` : ""}
         <div class="featured-site-meta">
           <span>${escapeHtml(site?.modelStatus || "待测")}</span>
           <span>${escapeHtml(site ? `稳定性 ${site.uptime24h}%` : "稳定性待测")}</span>
@@ -542,12 +542,9 @@ function featuredCard(person) {
 function featuredWechat(contact) {
   const value = contact.value || contact.label || "待补充";
   return `
-    <span class="featured-wechat" aria-label="微信 ${escapeAttribute(value)}" tabindex="0">
-      <span class="wechat-button" aria-hidden="true">微</span>
-      <span class="wechat-popover">
-        <span class="qr-placeholder" aria-hidden="true"></span>
-        <span><b>微信</b>${escapeHtml(value)}</span>
-      </span>
+    <span class="wechat-popover">
+      <span class="qr-placeholder" aria-hidden="true"></span>
+      <span><b>微信</b>${escapeHtml(value)}</span>
     </span>
   `;
 }
