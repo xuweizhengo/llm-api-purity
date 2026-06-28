@@ -121,7 +121,7 @@ function renderHome() {
     <section class="hero-shell">
       <div class="hero-copy">
         <h1 id="home-title">先看人，再选中转站</h1>
-        <p>不是收录最多的中转站，而是帮你看清每个站背后的人。</p>
+        <p>不追求收录最多，只记录中转站背后的公开身份、联系方式与当前状态。</p>
         <div class="hero-actions">
           <button class="primary-button" data-route="people" type="button">查看人物图鉴</button>
           <button class="secondary-button" data-route="sites" type="button">查看站点目录</button>
@@ -131,14 +131,14 @@ function renderHome() {
     </section>
 
     <section class="value-grid">
-      ${valueCard("背后是谁", "公开昵称、微信头像、GitHub、X、Telegram、微信。", "person")}
-      ${valueCard("有什么特点", "开源作者、早期研究者、站点运营者、号池玩家。", "star")}
-      ${valueCard("现在稳不稳", "网络可达、模型在线、首帧速度、24h 稳定性。", "shield")}
+      ${valueCard("背后是谁", "公开昵称、身份标签与可验证联系方式。", "person")}
+      ${valueCard("关联什么站", "站点域名、API Base、注册入口与负责人。", "star")}
+      ${valueCard("现在稳不稳", "网络可达、模型在线、首帧速度与 24h 稳定性。", "shield")}
     </section>
 
     <section class="section-head home-section-head">
       <div>
-        <h2>本周精选人物与站点</h2>
+        <h2>精选人物与站点</h2>
       </div>
       <button class="text-button arrow-link" data-route="people" type="button">查看全部精选</button>
     </section>
@@ -148,7 +148,7 @@ function renderHome() {
 
     <section class="section-head home-section-head">
       <div>
-        <h2>收录站点</h2>
+        <h2>精选站点目录</h2>
       </div>
     </section>
     ${siteTable(sites.slice(0, 10), { compact: true, numbered: true })}
