@@ -1,7 +1,7 @@
 {
   "name": "llm-api-purity",
   "version": "0.1.0",
-  "description": "OpenAI and Claude API purity checker with a local no-store test console.",
+  "description": "AI API relay people atlas with curated operator profiles, site directory, status metrics, and lead submission.",
   "type": "module",
   "private": false,
   "scripts": {
@@ -16,9 +16,11 @@
     "claude",
     "anthropic",
     "api",
-    "purity",
-    "proxy",
-    "checker"
+    "relay",
+    "directory",
+    "people",
+    "atlas",
+    "monitor"
   ],
   "author": "xuweizhengo",
   "license": "MIT",

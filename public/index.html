@@ -5,291 +5,65 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="PureAPI Radar 是 OpenAI 与 Claude API 纯度检测工具，验证模型指纹、协议结构、工具调用、流式事件、多模态和 Token 用量。"
+      content="中转生态人物图鉴：记录 AI API 中转服务背后的公开人物、联系方式与关联站点状态。"
     />
-    <meta name="theme-color" content="#21392d" />
-    <title>PureAPI Radar | OpenAI 与 Claude API 纯度检测</title>
+    <meta name="theme-color" content="#191713" />
+    <title>中转生态人物图鉴 | 先看人，再选中转站</title>
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
     <header class="topbar">
-      <a class="brand" href="#purity" aria-label="PureAPI Radar">
-        <span class="brand-mark" aria-hidden="true"><span></span></span>
+      <a class="brand" href="#home" aria-label="中转生态人物图鉴">
+        <span class="brand-mark" aria-hidden="true">人</span>
         <span>
-          <strong>PureAPI Radar</strong>
-          <small>LLM API 代理站点雷达</small>
+          <strong>中转生态人物图鉴</strong>
+          <small>AI API Relay People Atlas</small>
         </span>
       </a>
-      <nav class="nav" aria-label="Primary">
-        <button class="nav-link" data-target="ranking" type="button">榜单</button>
-        <button class="nav-link active" data-target="purity" type="button">纯度</button>
-        <button class="nav-link" data-target="principle" type="button">说明</button>
-        <button class="lang" type="button">中文</button>
+
+      <nav class="nav" aria-label="主导航">
+        <button class="nav-link active" data-route="home" type="button">首页</button>
+        <button class="nav-link" data-route="people" type="button">人物</button>
+        <button class="nav-link" data-route="sites" type="button">站点</button>
+        <button class="nav-link" data-route="submit/person" type="button">提交线索</button>
       </nav>
+
+      <div class="top-actions">
+        <label class="quick-search">
+          <span class="sr-only">快速查证</span>
+          <input id="global-search" placeholder="查微信号 / 域名" />
+        </label>
+        <button class="text-link" data-route="submit/claim" type="button">认领 / 纠错</button>
+      </div>
     </header>
 
     <main>
-      <section class="page-shell active" id="purity">
-        <div class="hero">
-          <p class="eyebrow">精准甄别，守护每一次 API 调用</p>
-          <h1>为保障账户安全，建议优先使用测试专用 API Key</h1>
-          <p class="hero-copy">
-            本工具不会存储你的 API Key。后端将按顺序检测模型指纹、结构、工具调用、流式事件、
-            多模态和 Token 用量倍率，并生成完整报告。
-          </p>
-
-          <form class="tool-card" id="check-form" autocomplete="off">
-            <div class="tool-head">
-              <div>
-                <h2>接口配置 <span>@PureAPI Radar 检测平台</span></h2>
-                <p><mark>OpenAI</mark> Responses · Tool Call · Streaming · Usage Audit</p>
-              </div>
-              <div class="tool-actions">
-                <button class="ghost-button" id="sample-report" type="button">检测白皮书</button>
-                <span class="security-note">redacted key · no-store · SSRF guarded</span>
-              </div>
-            </div>
-
-            <div class="form-grid">
-              <label>
-                <span>API 接口地址</span>
-                <input id="base-url" name="baseUrl" placeholder="https://api.openai.com" required />
-              </label>
-              <label>
-                <span>API Key</span>
-                <input id="api-key" name="apiKey" type="password" placeholder="sk-..." required />
-              </label>
-              <fieldset>
-                <legend>接口类型</legend>
-                <div class="segmented" role="radiogroup" aria-label="接口类型">
-                  <label>
-                    <input checked name="provider" type="radio" value="openai" />
-                    <span>OpenAI</span>
-                  </label>
-                  <label>
-                    <input name="provider" type="radio" value="claude" />
-                    <span>Claude</span>
-                  </label>
-                </div>
-              </fieldset>
-              <label>
-                <span>目标模型</span>
-                <input id="model" name="model" placeholder="gpt-4o / claude-sonnet-4-5" required />
-              </label>
-            </div>
-
-            <div class="submit-row">
-              <label class="checkline">
-                <input checked id="token-audit" name="tokenAudit" type="checkbox" />
-                <span>检测 Token 使用量是否异常，将发送多组短请求，预计产生少量实际上游消耗。</span>
-              </label>
-              <button class="primary-button" id="start-button" type="submit">开始检测</button>
-            </div>
-          </form>
-
-          <p class="result-hint" id="result-hint">
-            结果会在检测完成后显示为完整报告：分数圆环、验证项、延迟与 Token 指标、判定结论、Token 用量审计柱状图和明细表。
-          </p>
-        </div>
-
-        <section class="result-card hidden" id="result-card" aria-live="polite"></section>
+      <section class="page active" id="page-home" aria-labelledby="home-title">
+        <div id="home-root"></div>
       </section>
 
-      <section class="page-shell" id="ranking">
-        <div class="ranking-head">
-          <div>
-            <p class="eyebrow">API 代理站点榜单</p>
-            <h1>LLM API Relay Radar</h1>
-            <p>
-              按最低倍率、24h 可用率、首 Token 延迟、最新响应和纯度分生成综合排序。
-              站点目录来自后端 <code>data/sites.json</code>，监控结果由定时任务写入运行时结果文件。
-            </p>
-          </div>
-          <a class="primary-button compact" href="#purity">检测新站点</a>
-        </div>
-
-        <div class="ranking-stats" id="ranking-stats">
-          <div><span>站点数量</span><strong>--</strong></div>
-          <div><span>稳定站点</span><strong>--</strong></div>
-          <div><span>平均纯度</span><strong>--</strong></div>
-          <div><span>平均首 Token</span><strong>--</strong></div>
-        </div>
-
-        <div class="ranking-toolbar">
-          <label>
-            <span>搜索</span>
-            <input id="ranking-search" placeholder="OpenAI / Claude / relay / CN" />
-          </label>
-          <label>
-            <span>协议</span>
-            <select id="ranking-provider">
-              <option value="all">全部协议</option>
-              <option value="openai">OpenAI</option>
-              <option value="claude">Claude</option>
-              <option value="compatible">Compatible</option>
-            </select>
-          </label>
-          <label>
-            <span>排序</span>
-            <select id="ranking-sort">
-              <option value="score">综合分</option>
-              <option value="purity">纯度分</option>
-              <option value="uptime">可用率</option>
-              <option value="latency">首 Token</option>
-              <option value="multiplier">倍率</option>
-            </select>
-          </label>
-        </div>
-
-        <div class="ranking-grid" id="ranking-grid" aria-live="polite">
-          <div class="ranking-empty">榜单加载中...</div>
-        </div>
-
-        <div class="ranking-table-wrap">
-          <div class="ranking-table-head">
-            <h2>完整榜单</h2>
-            <span id="ranking-updated">等待数据</span>
-          </div>
-          <div class="ranking-table-scroll">
-            <table class="ranking-table">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>站点</th>
-                  <th>类型 / 协议</th>
-                  <th>纯度</th>
-                  <th>24h 可用率</th>
-                  <th>首 Token</th>
-                  <th>最新响应</th>
-                  <th>倍率</th>
-                  <th>状态</th>
-                  <th>入口</th>
-                </tr>
-              </thead>
-              <tbody id="ranking-table-body">
-                <tr><td colspan="10">榜单加载中...</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
+      <section class="page" id="page-people" aria-labelledby="people-title">
+        <div id="people-root"></div>
       </section>
 
-      <section class="page-shell" id="principle">
-        <div class="principle-hero">
-          <div>
-            <p class="eyebrow">PureAPI Radar 检测白皮书</p>
-            <h1>OpenAI 与 Claude API 纯度检测原理</h1>
-            <p>
-              纯度检测不是简单连通性测试，而是由后端对协议结构、工具调用、流式事件、
-              多模态输入、状态链路与 Token 用量进行逐项黑盒验证。
-            </p>
-            <button class="primary-button compact" data-target="purity" type="button">开始检测</button>
-          </div>
-          <div class="mini-chart" aria-label="Protocol chart">
-            <div class="chart-tabs">
-              <span>Protocol</span><span>Tool Use</span><span>Token Audit</span>
-            </div>
-            <div class="curve"></div>
-            <div class="chart-tags">
-              <span>SSE</span><span>Cache</span><span>Usage</span>
-            </div>
-          </div>
-        </div>
+      <section class="page" id="page-sites" aria-labelledby="sites-title">
+        <div id="sites-root"></div>
+      </section>
 
-        <div class="feature-grid">
-          <article>
-            <h3>后端真实探针</h3>
-            <p>每个检测项都会发起真实 API 请求，并用响应结构与事件序列生成证据。</p>
-          </article>
-          <article>
-            <h3>Key 不入库</h3>
-            <p>API Key 只用于本次请求，错误信息会脱敏，报告里只展示接口哈希。</p>
-          </article>
-          <article>
-            <h3>状态链路验证</h3>
-            <p>OpenAI 检测 Responses / Chat，Claude 检测 Messages / SSE / tool_use。</p>
-          </article>
-          <article>
-            <h3>成本倍率审计</h3>
-            <p>用多组短请求检查 usage、cached tokens 与实际用量的稳定性。</p>
-          </article>
-        </div>
+      <section class="page" id="page-detail" aria-labelledby="detail-title">
+        <div id="detail-root"></div>
+      </section>
 
-        <article class="explain-card">
-          <div>
-            <p class="label">为什么需要纯度检测</p>
-            <h2>中转站越多，接口“可用”和“纯净”越不能画等号</h2>
-            <p>
-              市场上的 API 中转服务质量参差不齐。一个接口能返回文本，并不代表它完整保留了官方协议、
-              工具调用、流式生命周期和 Token 用量统计。PureAPI Radar 通过多探针验证，帮助你识别隐藏风险。
-            </p>
-            <div class="risk-grid">
-              <section>
-                <strong>模型掺杂</strong>
-                <span>同一个模型名下可能被替换成别的模型，回答质量和工具调用表现会变化。</span>
-              </section>
-              <section>
-                <strong>协议残缺</strong>
-                <span>Responses、Messages、tool_use、SSE 等结构可能只做了部分兼容。</span>
-              </section>
-              <section>
-                <strong>异常来源</strong>
-                <span>共享缓存、状态链断裂、错误信息不规范会影响生产稳定性。</span>
-              </section>
-            </div>
-          </div>
-          <div class="flow-box">
-            <span>请求看似成功</span>
-            <span>真实来源不明</span>
-            <b>后端探针逐项验证后再给结论</b>
-          </div>
-        </article>
-
-        <article class="sequence-card">
-          <p class="label">Sequence</p>
-          <h2>一次检测的完整时序</h2>
-          <p>用户输入 URL 与 Key 后，后端按顺序验证目标 API，并把每个阶段作为报告证据。</p>
-          <div class="sequence">
-            <div class="lane">用户浏览器</div>
-            <div class="lane">PureAPI 后端</div>
-            <div class="lane">目标 API</div>
-            <div class="lane">前端报告</div>
-            <div class="arrow a1">1. 提交 URL / Key / Provider / Model</div>
-            <div class="arrow a2">2. GET /v1/models 基础鉴权</div>
-            <div class="arrow a3">3. 结构、工具调用、SSE、多模态探针</div>
-            <div class="arrow a4">4. Token audit · cache · state</div>
-            <div class="arrow a5">5. JSON 报告返回</div>
-          </div>
-        </article>
-
-        <div class="protocol-grid">
-          <article>
-            <h2>OpenAI 检测链路</h2>
-            <div class="pipeline"><span>Models</span><span>Responses</span><span>Tool Call</span><span>SSE</span><span>Audit</span></div>
-            <ul>
-              <li>GET /v1/models 验证 list 结构与模型可见性。</li>
-              <li>POST /v1/responses 或 /v1/chat/completions 验证结构。</li>
-              <li>tool_choice 要求模型返回 function tool_calls。</li>
-              <li>SSE 验证 delta 与 DONE 生命周期。</li>
-              <li>Token 审计使用 prompt、completion 与 cached tokens。</li>
-            </ul>
-          </article>
-          <article>
-            <h2>Claude 检测链路</h2>
-            <div class="pipeline"><span>Messages</span><span>tool_use</span><span>SSE</span><span>Image</span><span>Audit</span></div>
-            <ul>
-              <li>POST /v1/messages 验证 message 结构和 stop_reason。</li>
-              <li>tool_choice 指向 probe_ping，确认真实 tool_use 返回。</li>
-              <li>SSE 验证 message_start、content_block_delta、message_stop。</li>
-              <li>多模态使用 image block 检测 Messages 兼容性。</li>
-              <li>Token 审计使用 cache_creation 与 cache_read 字段。</li>
-            </ul>
-          </article>
-        </div>
+      <section class="page" id="page-submit" aria-labelledby="submit-title">
+        <div id="submit-root"></div>
       </section>
     </main>
 
-    <footer class="footer">数据来自公开目录与系统采样，展示结果以最新采样为准。</footer>
+    <footer class="footer">
+      <span>仅收录公开信息与站点自愿提交信息，支持本人认领、纠错与下架申请。</span>
+      <span>不是收录最多的中转站，而是帮你看清每个站背后的人。</span>
+    </footer>
+
     <script src="/app.js" type="module"></script>
   </body>
 </html>

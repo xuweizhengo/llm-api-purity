@@ -8,5 +8,6 @@ yarn-debug.log*
 dist/
 coverage/
 data/monitor-results.json
+data/submitted-leads.jsonl
 .DS_Store
 *.local

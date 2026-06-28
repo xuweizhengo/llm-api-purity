@@ -1,6 +1,6 @@
 import http from "node:http";
 import { createHash, randomBytes } from "node:crypto";
-import { mkdir, readFile, stat, writeFile } from "node:fs/promises";
+import { appendFile, mkdir, readFile, stat, writeFile } from "node:fs/promises";
 import { extname, join, normalize } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -9,6 +9,8 @@ const PUBLIC_DIR = join(__dirname, "public");
 const DATA_DIR = join(__dirname, "data");
 const RANKING_SITES_FILE = join(DATA_DIR, "sites.json");
 const RANKING_RESULTS_FILE = join(DATA_DIR, "monitor-results.json");
+const ECOSYSTEM_FILE = join(DATA_DIR, "ecosystem.json");
+const LEADS_FILE = join(DATA_DIR, "submitted-leads.jsonl");
 const PORT = Number.parseInt(process.env.PORT || "3078", 10);
 const REQUEST_TIMEOUT_MS = Number.parseInt(process.env.REQUEST_TIMEOUT_MS || "45000", 10);
 const MONITOR_INTERVAL_MS = Number.parseInt(process.env.MONITOR_INTERVAL_MS || "1800000", 10);
@@ -44,25 +46,40 @@ const MIME_TYPES = {
 
 const server = http.createServer(async (req, res) => {
   try {
-    if (req.method === "POST" && req.url === "/api/check") {
+    const requestUrl = new URL(req.url, "http://localhost");
+
+    if (req.method === "POST" && requestUrl.pathname === "/api/check") {
       const body = await readJsonBody(req);
       const report = await runPurityCheck(body);
       sendJson(res, 200, report);
       return;
     }
 
-    if (req.method === "GET" && req.url === "/api/sample") {
+    if (req.method === "GET" && requestUrl.pathname === "/api/sample") {
       sendJson(res, 200, buildSampleReport());
       return;
     }
 
-    if (req.method === "GET" && req.url === "/api/ranking") {
+    if (req.method === "GET" && requestUrl.pathname === "/api/ranking") {
       const ranking = await loadRanking();
       sendJson(res, 200, ranking);
       return;
     }
 
-    if (req.method === "POST" && req.url === "/api/ranking/refresh") {
+    if (req.method === "GET" && requestUrl.pathname === "/api/ecosystem") {
+      const ecosystem = await loadEcosystem();
+      sendJson(res, 200, ecosystem);
+      return;
+    }
+
+    if (req.method === "POST" && requestUrl.pathname === "/api/leads") {
+      const body = await readJsonBody(req);
+      const lead = await saveLead(body, req);
+      sendJson(res, 201, { ok: true, id: lead.id });
+      return;
+    }
+
+    if (req.method === "POST" && requestUrl.pathname === "/api/ranking/refresh") {
       authorizeRankingRefresh(req);
       await runRankingMonitor({ force: true });
       const ranking = await loadRanking();
@@ -86,7 +103,7 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.listen(PORT, () => {
-  console.log(`LLM API Purity is running at http://localhost:${PORT}`);
+  console.log(`AI Relay People Atlas is running at http://localhost:${PORT}`);
   startRankingMonitor();
 });
 
@@ -1210,6 +1227,57 @@ async function readMonitorResults() {
   } catch {
     return { updatedAt: null, sites: {} };
   }
+}
+
+async function loadEcosystem() {
+  try {
+    return JSON.parse(await readFile(ECOSYSTEM_FILE, "utf8"));
+  } catch {
+    return {
+      updatedAt: null,
+      people: [],
+      sites: [],
+      featured: []
+    };
+  }
+}
+
+async function saveLead(input, req) {
+  const type = pickString(input.type, 32);
+  if (!["person", "site", "claim", "business"].includes(type)) {
+    throw userError("Invalid lead type.", 400);
+  }
+
+  const lead = {
+    id: randomBytes(8).toString("hex"),
+    type,
+    createdAt: new Date().toISOString(),
+    remoteAddress: req.socket.remoteAddress || "",
+    userAgent: pickString(req.headers["user-agent"], 240),
+    payload: sanitizeLeadPayload(input.payload || {})
+  };
+
+  await mkdir(DATA_DIR, { recursive: true });
+  await appendFile(LEADS_FILE, `${JSON.stringify(lead)}\n`, "utf8");
+  return lead;
+}
+
+function sanitizeLeadPayload(payload) {
+  const output = {};
+  for (const [key, value] of Object.entries(payload)) {
+    if (Array.isArray(value)) {
+      output[key] = value.map((item) => pickString(item, 160)).filter(Boolean).slice(0, 24);
+    } else if (typeof value === "boolean") {
+      output[key] = value;
+    } else {
+      output[key] = pickString(value, key === "description" || key === "changes" || key === "cooperationNote" ? 2000 : 360);
+    }
+  }
+  return output;
+}
+
+function pickString(value, maxLength) {
+  return String(value ?? "").trim().slice(0, maxLength);
 }
 
 function trimHistory(history) {
