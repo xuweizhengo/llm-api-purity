@@ -538,18 +538,22 @@ dt {
 .featured-main {
   display: grid;
   grid-template-columns: 54px minmax(0, 1fr) 156px;
+  grid-template-rows: auto auto auto auto;
   gap: 12px;
   align-items: start;
   min-width: 0;
 }
 
 .featured-card .avatar {
+  grid-row: 1 / 5;
   width: 48px;
   height: 48px;
 }
 
 .featured-name {
   display: flex;
+  grid-column: 2 / 4;
+  grid-row: 1;
   align-items: center;
   flex-wrap: nowrap;
   gap: 8px;
@@ -558,7 +562,7 @@ dt {
 }
 
 .featured-info {
-  min-width: 0;
+  display: contents;
 }
 
 .featured-info h3 {
@@ -573,10 +577,10 @@ dt {
 
 .featured-name .pill {
   min-height: 22px;
-  max-width: 146px;
-  flex: 0 1 auto;
+  max-width: 220px;
+  flex: 0 0 auto;
   overflow: hidden;
-  padding: 2px 8px;
+  padding: 2px 10px;
   font-size: 11px;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -584,6 +588,8 @@ dt {
 
 .featured-info > span:not(.pill) {
   display: block;
+  grid-column: 2;
+  grid-row: 2;
   margin-top: 8px;
   color: var(--muted);
   font-size: 12px;
@@ -592,6 +598,8 @@ dt {
 
 .featured-info strong {
   display: block;
+  grid-column: 2;
+  grid-row: 3;
   margin-top: 2px;
   overflow: hidden;
   font-size: 18px;
@@ -600,6 +608,8 @@ dt {
 }
 
 .featured-info p {
+  grid-column: 2;
+  grid-row: 4;
   margin: 2px 0 0;
   overflow: hidden;
   font-size: 13px;
@@ -610,12 +620,14 @@ dt {
 
 .featured-contacts {
   display: grid;
+  grid-column: 3;
+  grid-row: 3 / 5;
   gap: 7px;
   border-left: 1px solid var(--line);
-  min-height: 70px;
+  min-height: 46px;
   align-content: end;
   min-width: 0;
-  padding: 28px 0 0 14px;
+  padding: 0 0 0 14px;
 }
 
 .contact-badge {
