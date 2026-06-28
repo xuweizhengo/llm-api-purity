@@ -503,29 +503,34 @@ function contactIcon(type) {
 function featuredCard(person) {
   const site = findSite(person.siteId);
   const contacts = (person.contacts || []).slice(0, 2);
-  const reason = person.featureReason || site?.characteristics?.[0] || person.subtitle || person.highlight || "";
+  const achievement = person.featureAchievement || person.featureReason || person.subtitle || person.highlight || "";
+  const proofTags = (person.featureTags || person.tags || []).slice(0, 4);
   return `
     <article class="featured-card" data-detail="${escapeAttribute(person.id)}">
       <div class="featured-main">
-        <div class="avatar">${escapeHtml(person.avatarText || person.name.slice(0, 1))}</div>
+        <div class="avatar featured-avatar">${escapeHtml(person.avatarText || person.name.slice(0, 1))}</div>
         <div class="featured-info">
           <div class="featured-name">
             <h3>${escapeHtml(person.name)}</h3>
-            ${pill(person.tags?.[0] || person.title, "gold")}
+            ${pill(person.title || person.tags?.[0] || "公开人物", "gold")}
           </div>
-          <span>运营站点</span>
-          <strong>${escapeHtml(site?.name || "暂无关联站点")}</strong>
-          <p class="featured-site-type">${escapeHtml(site?.type || person.highlight || "")}</p>
-          ${reason ? `<p class="featured-reason"><b>入选理由</b>${escapeHtml(reason)}</p>` : ""}
+          <p class="featured-identity">${escapeHtml(person.subtitle || person.identities?.[0] || person.highlight || "")}</p>
         </div>
+      </div>
+      <div class="featured-achievement">
+        <span>主要成就</span>
+        <p>${escapeHtml(achievement)}</p>
+      </div>
+      <div class="featured-proof">${proofTags.map((tag) => `<span>${escapeHtml(tag)}</span>`).join("")}</div>
+      <div class="featured-meta">
         <div class="featured-contacts">
           ${contacts.length ? contacts.map(contactBadge).join("") : `<span class="contact-badge">待补充公开联系方式</span>`}
         </div>
-      </div>
-      <div class="featured-status">
-        ${pill(site?.modelStatus || "待补充", site?.modelStatus === "在线" ? "good" : "warn")}
-        ${pill(site ? `首帧 ${site.firstTokenMs}ms` : "首帧待测", "gold")}
-        ${pill(site ? `稳定性 ${site.uptime24h}%` : "稳定性待测", "good")}
+        <div class="featured-site-meta">
+          <span><b>关联站点</b>${escapeHtml(site?.name || "待补充")}</span>
+          <span>${escapeHtml(site?.modelStatus || "待测")}</span>
+          <span>${escapeHtml(site ? `稳定性 ${site.uptime24h}%` : "稳定性待测")}</span>
+        </div>
       </div>
     </article>
   `;

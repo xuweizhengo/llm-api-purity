@@ -5,10 +5,10 @@
     {
       "id": "sub2api-author",
       "name": "林远舟",
-      "title": "Sub2API 生态使用者",
+      "title": "知名开源项目作者",
       "subtitle": "API 中转站运营者",
       "avatarText": "林",
-      "tags": ["Sub2API 生态", "站点运营者"],
+      "tags": ["知名开源项目作者", "中转生态"],
       "identities": ["中转站运营者", "API 代理服务维护者"],
       "contacts": [
         { "type": "wechat", "label": "微信", "value": "lin-api-2026" },
@@ -18,7 +18,9 @@
       "bio": "公开资料显示，该人物长期活跃于 Claude / OpenAI 中转服务相关社区，当前关联一个中转站点。",
       "siteId": "sub2api-hub",
       "highlight": "Claude / OpenAI 中转",
-      "featureReason": "Sub2API 生态入口，适合作为中转样本。"
+      "featureReason": "Sub2API 生态入口，适合作为中转样本。",
+      "featureAchievement": "主流中转站开源项目 CRS 和 Sub2API 的项目作者，中转站领域 TOP。",
+      "featureTags": ["CRS 作者", "Sub2API 作者", "开源项目", "中转生态"]
     },
     {
       "id": "koir-lab",
@@ -36,7 +38,9 @@
       "bio": "公开资料待补充。该条目用于记录 Koir 相关研究、站点和公开联系方式。",
       "siteId": "koir-api",
       "highlight": "多模型聚合与接口研究",
-      "featureReason": "早期多模型聚合实践，代表技术型线索。"
+      "featureReason": "早期多模型聚合实践，代表技术型线索。",
+      "featureAchievement": "围绕多模型聚合和接口兼容做早期实践，是技术型中转线索代表。",
+      "featureTags": ["Koir", "多模型聚合", "接口研究", "技术线索"]
     },
     {
       "id": "cctest-maintainer",
@@ -54,7 +58,9 @@
       "bio": "公开资料待补充。该条目用于记录 ccTest 相关检测能力和关联站点。",
       "siteId": "cctest-relay",
       "highlight": "接口兼容性监测",
-      "featureReason": "兼容性检测与状态观察，补足稳定性判断。"
+      "featureReason": "兼容性检测与状态观察，补足稳定性判断。",
+      "featureAchievement": "以兼容性检测和状态观察切入，帮助判断中转站模型在线与稳定性。",
+      "featureTags": ["检测工具", "状态观察", "兼容性", "可信线索"]
     },
     {
       "id": "btc193",
