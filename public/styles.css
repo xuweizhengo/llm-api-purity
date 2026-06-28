@@ -518,6 +518,7 @@ dt {
 .featured-grid {
   grid-template-columns: repeat(3, 1fr);
   gap: 14px;
+  min-width: 0;
 }
 
 .featured-card,
@@ -531,13 +532,15 @@ dt {
   padding: 14px;
   box-shadow: none;
   cursor: pointer;
+  overflow: hidden;
 }
 
 .featured-main {
   display: grid;
-  grid-template-columns: 58px minmax(150px, 1fr) 156px;
+  grid-template-columns: 54px minmax(0, 1fr) 160px;
   gap: 12px;
   align-items: start;
+  min-width: 0;
 }
 
 .featured-card .avatar {
@@ -548,14 +551,35 @@ dt {
 .featured-name {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 8px;
   min-height: 30px;
+  min-width: 0;
+}
+
+.featured-info {
+  min-width: 0;
 }
 
 .featured-info h3 {
+  flex: 0 0 auto;
   margin: 0;
-  font-size: 19px;
+  overflow: hidden;
+  font-family: Georgia, "Times New Roman", "Songti SC", "SimSun", serif;
+  font-size: 20px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.featured-name .pill {
+  min-height: 22px;
+  max-width: 120px;
+  flex: 0 1 auto;
+  overflow: hidden;
+  padding: 2px 8px;
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .featured-info > span:not(.pill) {
@@ -569,13 +593,19 @@ dt {
 .featured-info strong {
   display: block;
   margin-top: 2px;
+  overflow: hidden;
   font-size: 18px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .featured-info p {
   margin: 2px 0 0;
+  overflow: hidden;
   font-size: 13px;
   line-height: 1.45;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .featured-contacts {
@@ -584,13 +614,15 @@ dt {
   border-left: 1px solid var(--line);
   min-height: 70px;
   align-content: center;
-  padding-left: 16px;
+  min-width: 0;
+  padding-left: 14px;
 }
 
 .contact-badge {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
+  max-width: 100%;
   min-width: 0;
   color: #2c63b7;
   font-size: 12px;
@@ -600,8 +632,8 @@ dt {
 .contact-badge b {
   display: inline-grid;
   place-items: center;
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   flex: 0 0 auto;
   border-radius: 50%;
   background: #eef3fb;
@@ -609,13 +641,26 @@ dt {
   font-size: 10px;
 }
 
+.contact-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .featured-status {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 8px;
   margin-top: 14px;
   border-top: 1px solid var(--line);
   padding-top: 11px;
+}
+
+.featured-status .pill {
+  min-height: 24px;
+  padding: 3px 9px;
+  font-size: 11px;
 }
 
 .person-line {

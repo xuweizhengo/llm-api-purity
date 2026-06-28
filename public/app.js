@@ -485,7 +485,7 @@ function contactBadge(contact) {
   return `
     <span class="contact-badge">
       <b>${escapeHtml(contactIcon(contact.type))}</b>
-      ${escapeHtml(contact.value || contact.label || "待补充")}
+      <span class="contact-text">${escapeHtml(contact.value || contact.label || "待补充")}</span>
     </span>
   `;
 }
