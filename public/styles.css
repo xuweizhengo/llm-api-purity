@@ -398,6 +398,7 @@ dt {
 .value-grid {
   grid-template-columns: repeat(3, 1fr);
   gap: 14px;
+  max-width: 1120px;
   margin: 12px auto 16px;
 }
 
