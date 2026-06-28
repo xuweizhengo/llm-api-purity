@@ -541,10 +541,15 @@ function featuredCard(person) {
 
 function featuredWechat(contact) {
   const value = contact.value || contact.label || "待补充";
+  const qrImage = contact.qrImage || contact.qrUrl || "";
   return `
     <span class="wechat-popover">
-      <span class="qr-placeholder" aria-hidden="true"></span>
-      <span><b>微信</b>${escapeHtml(value)}</span>
+      ${
+        qrImage
+          ? `<img class="wechat-qr" src="${escapeAttribute(qrImage)}" alt="微信二维码 ${escapeAttribute(value)}" />`
+          : `<span class="qr-placeholder">二维码待补充</span>`
+      }
+      <span class="wechat-meta"><b>微信号</b><span>${escapeHtml(value)}</span><em>头像悬停查看，真实二维码可后续补图</em></span>
     </span>
   `;
 }
