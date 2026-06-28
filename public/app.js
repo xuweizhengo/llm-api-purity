@@ -484,10 +484,21 @@ function valueIcon(icon) {
 }
 
 function contactBadge(contact) {
+  const value = contact.value || contact.label || "待补充";
+  if (contact.type === "wechat") {
+    return `
+      <span class="contact-badge contact-wechat featured-wechat" aria-label="微信 ${escapeAttribute(value)}" tabindex="0">
+        <b>微信号</b>
+        <span class="contact-text">${escapeHtml(value)}</span>
+        ${featuredWechat(contact)}
+      </span>
+    `;
+  }
+
   return `
     <span class="contact-badge">
       <b>${escapeHtml(contactIcon(contact.type))}</b>
-      <span class="contact-text">${escapeHtml(contact.value || contact.label || "待补充")}</span>
+      <span class="contact-text">${escapeHtml(value)}</span>
     </span>
   `;
 }
@@ -495,9 +506,9 @@ function contactBadge(contact) {
 function contactIcon(type) {
   return {
     wechat: "微",
-    github: "G",
-    telegram: "T",
-    email: "@",
+    github: "github",
+    telegram: "telegram",
+    email: "email",
     x: "X"
   }[type] || "链";
 }
@@ -531,8 +542,8 @@ function featuredCard(person) {
       <div class="featured-meta">
         ${contacts.length ? `<div class="featured-contacts">${contacts.map(contactBadge).join("")}</div>` : ""}
         <div class="featured-site-meta">
-          <span>${escapeHtml(site?.modelStatus || "待测")}</span>
-          <span>${escapeHtml(site ? `稳定性 ${site.uptime24h}%` : "稳定性待测")}</span>
+          ${pill(site?.modelStatus || "待测", site?.modelStatus === "在线" ? "good" : "warn")}
+          ${pill(site ? `稳定性 ${site.uptime24h}%` : "稳定性待测", Number(site?.uptime24h || 0) >= 98 ? "good" : "warn")}
         </div>
       </div>
     </article>
