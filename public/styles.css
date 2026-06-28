@@ -398,7 +398,8 @@ dt {
 .value-grid {
   grid-template-columns: repeat(3, 1fr);
   gap: 14px;
-  max-width: 1120px;
+  width: 70%;
+  max-width: 900px;
   margin: 12px auto 16px;
 }
 
@@ -1258,6 +1259,7 @@ textarea:focus {
   .person-grid,
   .metric-grid,
   .directory-stats {
+    width: 100%;
     grid-template-columns: 1fr 1fr;
   }
 
