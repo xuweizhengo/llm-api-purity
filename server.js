@@ -27,6 +27,7 @@ const REQUEST_TIMEOUT_MS = Number.parseInt(process.env.REQUEST_TIMEOUT_MS || "45
 const MONITOR_INTERVAL_MS = Number.parseInt(process.env.MONITOR_INTERVAL_MS || "86400000", 10);
 const MONITOR_ON_START = process.env.MONITOR_ON_START === "true";
 const MONITOR_DEEP_CHECKS = process.env.MONITOR_DEEP_CHECKS === "true";
+const PUBLIC_LEADS_ENABLED = process.env.PUBLIC_LEADS_ENABLED === "true";
 const MAX_BODY_BYTES = 32 * 1024;
 
 let rankingCache = null;
@@ -97,6 +98,13 @@ const server = http.createServer(async (req, res) => {
     }
 
     if (req.method === "POST" && requestUrl.pathname === "/api/leads") {
+      if (!PUBLIC_LEADS_ENABLED) {
+        sendJson(res, 410, {
+          error: "网页提交入口已关闭，请通过公开联系方式主动联系。"
+        });
+        return;
+      }
+
       const body = await readJsonBody(req);
       const lead = await saveLead(body, req);
       sendJson(res, 201, { ok: true, id: lead.id });

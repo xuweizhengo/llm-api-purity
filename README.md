@@ -15,7 +15,7 @@
 - 关联哪个站
 - 现在稳不稳
 
-本项目围绕这四件事设计首页、人物目录、站点目录、人物站点联合详情页和提交线索页。
+本项目围绕这四件事设计首页、人物目录、站点目录、人物站点联合详情页和联系与更正规则页。
 
 ## 页面
 
@@ -23,7 +23,7 @@
 - 人物：轻量人物卡，展示公开身份、联系方式数量和关联站点。
 - 站点：精选站点目录，展示负责人、支持模型、网络、首帧、24h 稳定性。
 - 联合详情页：把人物详情和站点详情放在同一页，避免早期资料太少导致页面空。
-- 提交线索：人物信息、站点信息、纠错/认领、商务合作四个 tab。
+- 联系规则：说明为什么关闭网页提交、如何通过公开联系方式处理更正、认领与下架请求。
 
 ## 快速开始
 
@@ -94,13 +94,13 @@ Docker 模式下容器内固定监听 `3078`，如果只想改宿主机暴露端
 data/ecosystem.json
 ```
 
-提交线索运行时文件：
+网页提交默认关闭。若后续临时启用 `PUBLIC_LEADS_ENABLED=true`，提交内容会写入运行时文件：
 
 ```text
 data/submitted-leads.jsonl
 ```
 
-`submitted-leads.jsonl` 已加入 `.gitignore`，不会被提交到仓库。
+`submitted-leads.jsonl` 已加入 `.gitignore`，不会被提交到仓库。当前前端不提供表单入口，默认接口也会拒绝网页提交。
 
 大规模公开站点目录：
 
@@ -127,12 +127,12 @@ data/monitor-results.json
 - `ecosystem_sites`：精选站点目录。
 - `ranking_sites`：大规模公开站点库和监控配置。
 - `monitor_results`：每次探活结果，保留 24h 历史用于计算稳定性。
-- `leads`：提交线索、认领、纠错和商务合作表单。
+- `leads`：预留的后台线索表；公开网页提交默认关闭，仅在显式启用时写入。
 
 ## 接口
 
 - `GET /api/ecosystem`：读取人物图鉴和精选站点数据。
-- `POST /api/leads`：提交人物、站点、纠错/认领或商务合作线索。
+- `POST /api/leads`：默认返回关闭说明；仅当 `PUBLIC_LEADS_ENABLED=true` 时接受线索写入。
 - `GET /api/ranking`：读取后端站点目录和监控结果。
 - `POST /api/ranking/refresh`：手动刷新站点监控。
 - `GET /api/health`：健康检查和当前数据源。
@@ -162,6 +162,7 @@ npm run import:proxyai
 | `MONITOR_ON_START` | `false` | 服务启动后是否立即跑一次监控 |
 | `MONITOR_DEEP_CHECKS` | `false` | 是否启用真实 API 深度检测，会消耗 Key 额度 |
 | `RANKING_ADMIN_TOKEN` | 空 | 远程手动刷新时的 Bearer Token |
+| `PUBLIC_LEADS_ENABLED` | `false` | 是否开放网页线索提交接口；默认关闭 |
 
 手动刷新：
 
@@ -185,9 +186,9 @@ curl -X POST http://localhost:3078/api/ranking/refresh \
 
 页面文案默认强调：
 
-> 仅收录公开信息与站点自愿提交信息，支持本人认领、纠错与下架申请。
+> 仅整理公开信息；更正、认领与下架请求请通过公开联系方式主动联系。
 
-建议后续维护时坚持这个边界，只展示公开资料、本人提交资料或站点方授权资料，避免把项目做成隐私曝光站。
+建议后续维护时坚持这个边界，只展示公开资料、站点方公开说明、本人或团队能验证的主动联系信息，避免把项目做成隐私曝光站或匿名爆料入口。
 
 ## License
 

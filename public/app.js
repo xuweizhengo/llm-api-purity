@@ -21,13 +21,6 @@ const state = {
   query: ""
 };
 
-const submitTabs = {
-  person: "人物信息",
-  site: "站点信息",
-  claim: "纠错 / 认领",
-  business: "商务合作"
-};
-
 initialize();
 
 async function initialize() {
@@ -128,7 +121,7 @@ function renderHome() {
           <button class="primary-button" data-route="people" type="button">查看人物图鉴</button>
           <button class="secondary-button" data-route="sites" type="button">查看站点目录</button>
         </div>
-        <p class="trust-note"><span class="trust-icon" aria-hidden="true">◇</span>仅收录公开信息与站点自愿提交信息，支持本人认领、纠错与下架申请。</p>
+        <p class="trust-note"><span class="trust-icon" aria-hidden="true">◇</span>仅整理公开信息；更正、认领与下架请求请通过公开联系方式主动联系。</p>
       </div>
     </section>
 
@@ -158,10 +151,10 @@ function renderHome() {
     <section class="submit-band">
       <div class="submit-band-icon" aria-hidden="true">人</div>
       <div>
-        <h2>知道某个站背后的人？</h2>
-        <p>提交公开线索，帮助补全中转生态人物图鉴。</p>
+        <h2>信息需要更正？</h2>
+        <p>请优先通过人物或站点已公开的联系方式主动联系，避免网页匿名提交带来的真假难辨。</p>
       </div>
-      <button class="primary-button compact" data-route="submit/person" type="button">提交线索</button>
+      <button class="primary-button compact" data-route="submit" type="button">查看联系规则</button>
     </section>
   `;
 }
@@ -173,7 +166,7 @@ function renderPeople() {
       <div>
         <p class="eyebrow">People</p>
         <h1 id="people-title">中转生态人物图鉴</h1>
-        <p>从人物进入中转生态：谁在维护项目，谁在运营站点，谁提供检测与判断依据。这里只整理公开线索，并保留认领与纠错入口。</p>
+        <p>从人物进入中转生态：谁在维护项目，谁在运营站点，谁提供检测与判断依据。这里只整理公开线索，信息更正以主动联系和可验证材料为准。</p>
       </div>
       ${localSearch("搜索人物、身份、微信、GitHub、站点名")}
     </section>
@@ -227,11 +220,11 @@ function renderDetail(id) {
           ${pill(site ? "关联站点 1 个" : "暂无关联站点", "neutral")}
           ${pill(site?.modelStatus === "在线" ? "站点状态正常" : "站点待观察", site?.modelStatus === "在线" ? "good" : "warn")}
         </div>
-        <p class="trust-note inline">仅展示公开信息与站点自愿提交信息。</p>
+        <p class="trust-note inline">仅展示公开信息与可验证的主动联系信息。</p>
       </div>
       <div class="detail-actions">
-        <button class="primary-button compact" data-route="submit/person" type="button">提交补充信息</button>
-        <button class="secondary-button compact" data-route="submit/claim" type="button">申请认领</button>
+        <button class="primary-button compact" data-route="submit" type="button">查看联系规则</button>
+        <button class="secondary-button compact" data-route="sites" type="button">返回站点目录</button>
       </div>
     </section>
 
@@ -259,56 +252,57 @@ function renderDetail(id) {
         </div>
       </article>
       <article class="panel">
-        <h2>补充与纠错</h2>
-        <p class="muted">如果你是本人或站点维护者，可以提交补充信息、更新联系方式或申请下架。</p>
+        <h2>更正与下架</h2>
+        <p class="muted">如果你是本人或站点维护者，请通过公开联系方式主动联系，并附可验证材料。网页匿名提交暂不开放。</p>
         <div class="split-actions">
-          <button class="primary-button compact" data-route="submit/person" type="button">提交线索</button>
-          <button class="secondary-button compact" data-route="submit/claim" type="button">申请下架</button>
+          <button class="primary-button compact" data-route="submit" type="button">查看处理规则</button>
+          <button class="secondary-button compact" data-route="sites" type="button">查看站点目录</button>
         </div>
       </article>
     </section>
   `;
 }
 
-function renderSubmit(tab) {
-  const activeTab = submitTabs[tab] ? tab : "person";
+function renderSubmit() {
   roots.submit.innerHTML = `
     <section class="page-head submit-head">
       <div>
-        <p class="eyebrow">Submit</p>
-        <h1 id="submit-title">提交线索</h1>
-        <p>补充公开人物、关联站点、联系方式与站点状态信息。</p>
+        <p class="eyebrow">Contact Rules</p>
+        <h1 id="submit-title">联系与更正规则</h1>
+        <p>暂不开放网页提交线索、认领或纠错表单。人物与站点信息需要可验证来源，匿名网页提交很难判断真假。</p>
       </div>
-      <div class="rule-box">仅接受公开信息、本人提交信息或站点自愿提交信息。涉及隐私、攻击、造谣、无法验证的内容不会展示。</div>
+      <div class="rule-box">优先通过已公开联系方式沟通；涉及下架、认领、联系方式更新时，需要能证明身份或站点归属的公开材料。</div>
     </section>
 
     <section class="submit-layout">
-      <article class="panel form-panel">
-        <h2>你想提交什么？</h2>
-        <div class="tabs">
-          ${Object.entries(submitTabs)
-            .map(([key, label]) => `<button class="${key === activeTab ? "active" : ""}" data-route="submit/${key}" type="button">${label}</button>`)
-            .join("")}
+      <article class="panel contact-panel">
+        <h2>为什么关闭网页提交？</h2>
+        <div class="note-list">
+          <div>人物页、站点归属和联系方式都属于高信任信息，匿名提交无法确认信息来源。</div>
+          <div>开放表单容易引入冒名认领、恶意纠错、竞争对手攻击和不可验证爆料。</div>
+          <div>当前只整理公开信息、站点方公开说明、本人或团队能验证的主动联系信息。</div>
         </div>
-        <form id="lead-form" data-type="${escapeAttribute(activeTab)}">
-          ${submitFields(activeTab)}
-          <label class="checkline">
-            <input name="confirmed" required type="checkbox" />
-            <span>我确认提交内容来自公开信息、本人信息或站点自愿提交信息</span>
-          </label>
-          <div class="form-actions">
-            <button class="primary-button" type="submit">${submitButtonText(activeTab)}</button>
-            <button class="text-button" data-route="submit/claim" type="button">查看处理规则</button>
-          </div>
-        </form>
+        <div class="split-actions contact-actions">
+          <button class="primary-button compact" data-route="people" type="button">查看人物图鉴</button>
+          <button class="secondary-button compact" data-route="sites" type="button">查看站点目录</button>
+        </div>
       </article>
       <aside class="submit-side">
-        ${submitSidebar(activeTab)}
+        ${sideCards([
+          ["更正信息", ["通过人物或站点已公开渠道联系", "说明要修改的页面与字段", "附公开证明链接或站点公告"]],
+          ["认领页面", ["使用可验证身份联系", "提供 GitHub / 官网 / X 等公开材料", "不接受匿名冒名申请"]],
+          ["下架请求", ["本人或站点方优先处理", "隐私与错误信息优先隐藏", "争议信息以公开来源为准"]]
+        ])}
       </aside>
     </section>
 
     <section class="process">
-      ${processSteps(activeTab).map((step, index) => `
+      ${[
+        { title: "主动联系", text: "通过已公开微信、GitHub、Telegram、官网或邮箱联系。" },
+        { title: "提供依据", text: "说明更正内容，并给出公开证明或可验证身份材料。" },
+        { title: "人工核对", text: "核对公开来源、站点归属和联系方式有效性。" },
+        { title: "更新展示", text: "确认后更新、隐藏或下架相关条目。" }
+      ].map((step, index) => `
         <div>
           <span>0${index + 1}</span>
           <strong>${escapeHtml(step.title)}</strong>
@@ -317,150 +311,6 @@ function renderSubmit(tab) {
       `).join("")}
     </section>
   `;
-
-  document.querySelector("#lead-form")?.addEventListener("submit", handleLeadSubmit);
-}
-
-async function handleLeadSubmit(event) {
-  event.preventDefault();
-  const form = event.currentTarget;
-  const type = form.dataset.type;
-  const payload = collectFormPayload(form);
-
-  try {
-    const response = await fetch("/api/leads", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ type, payload })
-    });
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error || "提交失败");
-    form.reset();
-    toast(`提交成功，编号 ${data.id}`);
-  } catch (error) {
-    toast(error.message || "提交失败，请稍后重试");
-  }
-}
-
-function submitFields(tab) {
-  const commonContact = `
-    <label>
-      <span>你的联系方式</span>
-      <input name="contact" placeholder="便于核实，不公开展示" />
-    </label>
-  `;
-
-  if (tab === "site") {
-    return `
-      ${field("站点名称", "siteName", "例如：AI Route / Koir API")}
-      ${field("站点域名", "domain", "例如：ai-route.example")}
-      ${field("API Base", "apiBase", "例如：https://api.ai-route.example/v1")}
-      ${field("注册入口", "entryUrl", "官网或注册链接")}
-      ${chipField("支持模型", "models", ["Claude", "OpenAI", "Gemini", "Grok", "Midjourney", "其他"])}
-      ${field("负责人 / 联系人", "owner", "公开昵称、微信或 GitHub")}
-      ${field("公开联系方式", "publicContact", "微信 / GitHub / X / Telegram，至少一个公开来源")}
-      ${radioField("是否接受状态监控", "monitor", ["接受监控", "暂不监控"])}
-      ${textarea("站点说明", "description", "一句话说明站点特点、价格、适合场景等")}
-      ${commonContact}
-    `;
-  }
-
-  if (tab === "claim") {
-    return `
-      ${radioField("处理类型", "claimType", ["申请认领", "信息纠错", "更新联系方式", "请求下架"])}
-      ${field("相关页面", "target", "人物页链接、站点页链接、微信号或域名")}
-      ${field("你的身份", "identity", "本人 / 站点维护者 / 相关团队成员 / 其他")}
-      ${field("可验证联系方式", "verifiedContact", "微信 / GitHub / X / Telegram / 邮箱，用于核实")}
-      ${textarea("需要修改的内容", "changes", "请说明哪些信息需要补充、修正或移除")}
-      ${field("公开证明链接", "proofUrl", "官网公告、GitHub、X 主页、站点后台说明链接等")}
-      ${selectField("下架原因", "removalReason", ["仅请求下架时填写", "本人要求", "信息错误", "已停止运营", "其他"])}
-      ${commonContact}
-    `;
-  }
-
-  if (tab === "business") {
-    return `
-      ${radioField("合作类型", "cooperationType", ["站点展示", "赞助位", "监控展示", "品牌合作"])}
-      ${field("站点 / 品牌名称", "brand", "例如：AI Route")}
-      ${field("官网或注册入口", "entryUrl", "https://...")}
-      ${field("联系人", "owner", "公开昵称或负责人")}
-      ${field("联系方式", "contactMethod", "微信 / Telegram / 邮箱，用于沟通")}
-      ${selectField("希望展示的位置", "placement", ["首页精选", "站点目录", "人物详情页", "其他"])}
-      ${chipField("可提供信息", "materials", ["负责人公开信息", "API Base", "支持模型", "价格说明", "公告链接", "客服方式"])}
-      ${textarea("合作说明", "cooperationNote", "简单说明你的站点特点、希望展示的内容或预算范围")}
-      ${commonContact}
-    `;
-  }
-
-  return `
-    ${field("相关人物或昵称", "personName", "例如：林远舟 / KoirLab")}
-    ${chipField("公开身份", "identities", ["中转站运营者", "开源作者", "检测站维护者", "API 代理服务维护者"])}
-    ${field("关联站点", "site", "站点名称或域名")}
-    ${field("公开联系方式", "publicContact", "微信 / GitHub / X / Telegram，至少一个公开来源")}
-    ${field("公开链接", "publicUrl", "官网、GitHub、X 主页、公告链接等")}
-    ${textarea("线索说明", "description", "简单说明这条信息为什么值得收录")}
-    ${commonContact}
-  `;
-}
-
-function submitSidebar(tab) {
-  if (tab === "site") {
-    return sideCards([
-      ["建议填写", ["站点名称", "域名", "API Base", "注册入口", "支持模型", "负责人"]],
-      ["监控会展示", ["网络可达", "模型在线", "首帧速度", "24h 稳定性"]],
-      ["站点方权益", ["认领资料", "更新联系方式", "修正 API Base", "申请下架"]]
-    ]);
-  }
-  if (tab === "claim") {
-    return sideCards([
-      ["适用场景", ["认领人物页", "更新联系方式", "修正关联站点", "请求隐藏或下架"]],
-      ["需要核实", ["申请人身份", "页面归属关系", "公开证明链接", "联系方式有效性"]],
-      ["处理原则", ["优先保护本人权益", "不展示私人信息", "不展示无法验证内容", "支持补充说明"]]
-    ]);
-  }
-  if (tab === "business") {
-    return sideCards([
-      ["可合作位置", ["首页精选人物与站点", "站点目录优先展示", "详情页品牌露出", "状态监控展示"]],
-      ["展示前会核对", ["域名可访问", "API Base 可用性", "联系方式有效", "是否涉及高风险内容"]],
-      ["不接受", ["虚假宣传", "无法联系的站点", "恶意竞争内容", "无授权冒名提交"]]
-    ]);
-  }
-  return sideCards([
-    ["可以提交", ["公开昵称", "微信头像", "GitHub / X / TG", "关联站点", "API Base", "注册入口"]],
-    ["不会展示", ["私人手机号", "未公开住址", "攻击性内容", "无法验证的爆料"]],
-    ["站点方入口", ["申请认领", "更新联系方式", "请求下架", "赞助展示"]]
-  ]);
-}
-
-function processSteps(tab) {
-  if (tab === "site") {
-    return [
-      { title: "初步核对", text: "确认站点和公开信息是否可访问。" },
-      { title: "连通性检查", text: "检查域名、API Base 和基础状态。" },
-      { title: "上线展示", text: "通过后进入站点目录或关联人物页。" }
-    ];
-  }
-  if (tab === "claim") {
-    return [
-      { title: "提交申请", text: "说明要认领、纠错或下架的页面。" },
-      { title: "身份核实", text: "核对公开证明和可验证联系方式。" },
-      { title: "人工处理", text: "更新展示内容并保留必要说明。" },
-      { title: "结果通知", text: "通常 1-3 个工作日内处理。" }
-    ];
-  }
-  if (tab === "business") {
-    return [
-      { title: "提交意向", text: "说明站点特点和希望展示的位置。" },
-      { title: "信息核实", text: "检查域名、API Base 与联系方式。" },
-      { title: "确认方案", text: "确认展示内容和更新方式。" },
-      { title: "上线更新", text: "合作展示仍保留状态与风险提示。" }
-    ];
-  }
-  return [
-    { title: "初步核对", text: "检查是否为公开信息或本人提交。" },
-    { title: "人工整理", text: "合并人物、站点与联系方式。" },
-    { title: "上线展示", text: "通过后进入人物图鉴或站点目录。" }
-  ];
 }
 
 function valueCard(title, text, icon) {
@@ -739,84 +589,6 @@ function bindLocalSearch() {
   });
 }
 
-function collectFormPayload(form) {
-  const formData = new FormData(form);
-  const payload = {};
-  for (const [key, value] of formData.entries()) {
-    if (key === "confirmed") {
-      payload[key] = true;
-      continue;
-    }
-    if (payload[key]) {
-      payload[key] = Array.isArray(payload[key]) ? [...payload[key], value] : [payload[key], value];
-    } else {
-      payload[key] = value;
-    }
-  }
-  return payload;
-}
-
-function field(label, name, placeholder) {
-  return `
-    <label>
-      <span>${escapeHtml(label)}</span>
-      <input name="${escapeAttribute(name)}" placeholder="${escapeAttribute(placeholder)}" />
-    </label>
-  `;
-}
-
-function textarea(label, name, placeholder) {
-  return `
-    <label class="full">
-      <span>${escapeHtml(label)}</span>
-      <textarea name="${escapeAttribute(name)}" placeholder="${escapeAttribute(placeholder)}"></textarea>
-    </label>
-  `;
-}
-
-function chipField(label, name, options) {
-  return `
-    <fieldset class="full chip-field">
-      <legend>${escapeHtml(label)}</legend>
-      <div>
-        ${options.map((option) => `
-          <label>
-            <input name="${escapeAttribute(name)}" type="checkbox" value="${escapeAttribute(option)}" />
-            <span>${escapeHtml(option)}</span>
-          </label>
-        `).join("")}
-      </div>
-    </fieldset>
-  `;
-}
-
-function radioField(label, name, options) {
-  return `
-    <fieldset class="full radio-field">
-      <legend>${escapeHtml(label)}</legend>
-      <div>
-        ${options.map((option, index) => `
-          <label>
-            <input ${index === 0 ? "checked" : ""} name="${escapeAttribute(name)}" type="radio" value="${escapeAttribute(option)}" />
-            <span>${escapeHtml(option)}</span>
-          </label>
-        `).join("")}
-      </div>
-    </fieldset>
-  `;
-}
-
-function selectField(label, name, options) {
-  return `
-    <label>
-      <span>${escapeHtml(label)}</span>
-      <select name="${escapeAttribute(name)}">
-        ${options.map((option) => `<option value="${escapeAttribute(option)}">${escapeHtml(option)}</option>`).join("")}
-      </select>
-    </label>
-  `;
-}
-
 function sideCards(cards) {
   return cards
     .map(([title, items]) => `
@@ -826,15 +598,6 @@ function sideCards(cards) {
       </article>
     `)
     .join("");
-}
-
-function submitButtonText(tab) {
-  return {
-    person: "提交线索",
-    site: "提交站点",
-    claim: "提交申请",
-    business: "提交合作意向"
-  }[tab];
 }
 
 function filterPeople(people) {
