@@ -21,6 +21,7 @@ export async function initializeDatabase({ schemaFile, ecosystemFile, rankingSit
   try {
     const schema = await readFile(schemaFile, "utf8");
     await client.query(schema);
+    await runLightweightMigrations(client);
 
     if (process.env.DB_SEED_ON_START !== "false") {
       await seedEmptyDatabase(client, { ecosystemFile, rankingSitesFile });
@@ -90,6 +91,7 @@ export async function loadEcosystemFromDb() {
       title: person.title,
       subtitle: person.subtitle,
       avatarText: person.avatar_text,
+      avatarUrl: person.avatar_url,
       tags: tagsByPerson.get(person.id) || [],
       identities: identitiesByPerson.get(person.id) || [],
       contacts: contactsByPerson.get(person.id) || [],
@@ -253,6 +255,23 @@ export async function saveLeadToDb(lead) {
   return lead;
 }
 
+export async function importEcosystemFromFile(ecosystemFile) {
+  ensureDatabase();
+  const client = await pool.connect();
+  try {
+    await runLightweightMigrations(client);
+    const ecosystem = await readJsonFile(ecosystemFile, { updatedAt: null, featured: [], people: [], sites: [] });
+    await seedEcosystem(client, ecosystem);
+    return {
+      people: (ecosystem.people || []).length,
+      sites: (ecosystem.sites || []).length,
+      featured: (ecosystem.featured || []).length
+    };
+  } finally {
+    client.release();
+  }
+}
+
 async function seedEmptyDatabase(client, { ecosystemFile, rankingSitesFile }) {
   const { rows: peopleRows } = await client.query("SELECT count(*)::int AS count FROM people");
   const { rows: rankingRows } = await client.query("SELECT count(*)::int AS count FROM ranking_sites");
@@ -268,8 +287,14 @@ async function seedEmptyDatabase(client, { ecosystemFile, rankingSitesFile }) {
   }
 }
 
+async function runLightweightMigrations(client) {
+  await client.query("ALTER TABLE people ADD COLUMN IF NOT EXISTS avatar_url TEXT NOT NULL DEFAULT ''");
+}
+
 async function seedEcosystem(client, ecosystem) {
   const featured = new Set(ecosystem.featured || []);
+  const personIds = (ecosystem.people || []).map((person) => person.id).filter(Boolean);
+  const siteIds = (ecosystem.sites || []).map((site) => site.id).filter(Boolean);
   await client.query("BEGIN");
   try {
     await client.query(
@@ -281,19 +306,23 @@ async function seedEcosystem(client, ecosystem) {
       [{ updatedAt: ecosystem.updatedAt || null }]
     );
 
+    await client.query("DELETE FROM ecosystem_sites WHERE NOT (id = ANY($1::text[]))", [siteIds]);
+    await client.query("DELETE FROM people WHERE NOT (id = ANY($1::text[]))", [personIds]);
+
     for (const [index, person] of (ecosystem.people || []).entries()) {
       await client.query(
         `
           INSERT INTO people (
-            id, name, title, subtitle, avatar_text, bio, site_id, highlight,
+            id, name, title, subtitle, avatar_text, avatar_url, bio, site_id, highlight,
             feature_reason, feature_achievement, featured, sort_order, updated_at
           )
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, now())
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, now())
           ON CONFLICT (id) DO UPDATE SET
             name = EXCLUDED.name,
             title = EXCLUDED.title,
             subtitle = EXCLUDED.subtitle,
             avatar_text = EXCLUDED.avatar_text,
+            avatar_url = EXCLUDED.avatar_url,
             bio = EXCLUDED.bio,
             site_id = EXCLUDED.site_id,
             highlight = EXCLUDED.highlight,
@@ -309,6 +338,7 @@ async function seedEcosystem(client, ecosystem) {
           person.title || "",
           person.subtitle || "",
           person.avatarText || "",
+          person.avatarUrl || "",
           person.bio || "",
           person.siteId || "",
           person.highlight || "",

@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS people (
   title TEXT NOT NULL DEFAULT '',
   subtitle TEXT NOT NULL DEFAULT '',
   avatar_text TEXT NOT NULL DEFAULT '',
+  avatar_url TEXT NOT NULL DEFAULT '',
   bio TEXT NOT NULL DEFAULT '',
   site_id TEXT NOT NULL DEFAULT '',
   highlight TEXT NOT NULL DEFAULT '',

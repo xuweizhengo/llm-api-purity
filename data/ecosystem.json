@@ -1,6 +1,10 @@
 {
-  "updatedAt": "2026-06-28T00:00:00+08:00",
-  "featured": ["sub2api-author", "koir-lab", "cctest-maintainer"],
+  "updatedAt": "2026-06-30T21:45:00+08:00",
+  "featured": [
+    "sub2api-author",
+    "qianyu-i7relay",
+    "koir-lab"
+  ],
   "people": [
     {
       "id": "sub2api-author",
@@ -8,19 +12,91 @@
       "title": "知名开源项目作者",
       "subtitle": "API 中转站运营者",
       "avatarText": "林",
-      "tags": ["知名开源项目作者", "中转生态"],
-      "identities": ["中转站运营者", "API 代理服务维护者"],
-      "contacts": [
-        { "type": "wechat", "label": "微信", "value": "lin-api-2026" },
-        { "type": "github", "label": "GitHub", "value": "github.com/example" }
+      "tags": [
+        "知名开源项目作者",
+        "中转生态"
       ],
-      "links": [{ "label": "GitHub", "url": "https://github.com/example" }],
+      "identities": [
+        "中转站运营者",
+        "API 代理服务维护者"
+      ],
+      "contacts": [
+        {
+          "type": "wechat",
+          "label": "微信",
+          "value": "lin-api-2026"
+        },
+        {
+          "type": "github",
+          "label": "GitHub",
+          "value": "github.com/example"
+        }
+      ],
+      "links": [
+        {
+          "label": "GitHub",
+          "url": "https://github.com/example"
+        }
+      ],
       "bio": "公开资料显示，该人物长期活跃于 Claude / OpenAI 中转服务相关社区，当前关联一个中转站点。",
       "siteId": "sub2api-hub",
       "highlight": "Claude / OpenAI 中转",
       "featureReason": "Sub2API 生态入口，适合作为中转样本。",
       "featureAchievement": "主流中转站开源项目 CRS 和 Sub2API 的项目作者，中转站领域 TOP。",
-      "featureTags": ["CRS 作者", "Sub2API 作者", "开源项目", "中转生态"]
+      "featureTags": [
+        "CRS 作者",
+        "Sub2API 作者",
+        "开源项目",
+        "中转生态"
+      ]
+    },
+    {
+      "id": "qianyu-i7relay",
+      "name": "千羽",
+      "title": "Koir 逆向与中转检测推动者",
+      "subtitle": "i7Relay 维护者 / ccTest 发起者 / 肉身位置：日本",
+      "avatarText": "千",
+      "tags": [
+        "Koir 逆向",
+        "ccTest",
+        "中转检测",
+        "日本"
+      ],
+      "identities": [
+        "i7Relay 维护者",
+        "ccTest 发起者",
+        "Koir 逆向早期参与者",
+        "Claude Code 中转研究者"
+      ],
+      "contacts": [
+        {
+          "type": "wechat",
+          "label": "微信",
+          "value": "千羽"
+        }
+      ],
+      "links": [
+        {
+          "label": "i7Relay",
+          "url": "https://i7dc.com/"
+        },
+        {
+          "label": "ccTest",
+          "url": "https://cctest.ai/"
+        }
+      ],
+      "bio": "公开资料与社区信息显示，千羽长期参与 Koir 相关逆向与 Claude Code 中转研究，维护 i7Relay，并发起 ccTest 中转检测站。ccTest 以黑盒检测、模型来源判定和监控能力为核心，已成为中转站展示兼容性与稳定性时经常引用的检测参考。",
+      "siteId": "i7relay",
+      "highlight": "Koir 逆向与中转检测标准",
+      "featureReason": "兼具技术源头、站点运营和检测标准三重标签，是中转生态里辨识度很高的样本。",
+      "featureAchievement": "Koir 逆向与 Claude Code 中转研究的早期参与者之一，维护 i7Relay，并发起 ccTest 检测站，推动中转检测成为行业常用参考。",
+      "featureTags": [
+        "Koir 逆向",
+        "ccTest 发起者",
+        "i7Relay",
+        "日本"
+      ],
+      "avatarUrl": "/avatars/qianyu.jpg"
     },
     {
       "id": "koir-lab",
@@ -28,39 +104,43 @@
       "title": "早期模型接口研究者",
       "subtitle": "Koir 相关中转研究与接口实践",
       "avatarText": "K",
-      "tags": ["早期研究者", "多模型接口"],
-      "identities": ["模型接口研究者", "API Relay 观察者"],
-      "contacts": [
-        { "type": "wechat", "label": "微信", "value": "koir_lab" },
-        { "type": "github", "label": "GitHub", "value": "github.com/koirlab" }
+      "tags": [
+        "早期研究者",
+        "多模型接口"
       ],
-      "links": [{ "label": "GitHub", "url": "https://github.com/koirlab" }],
+      "identities": [
+        "模型接口研究者",
+        "API Relay 观察者"
+      ],
+      "contacts": [
+        {
+          "type": "wechat",
+          "label": "微信",
+          "value": "koir_lab"
+        },
+        {
+          "type": "github",
+          "label": "GitHub",
+          "value": "github.com/koirlab"
+        }
+      ],
+      "links": [
+        {
+          "label": "GitHub",
+          "url": "https://github.com/koirlab"
+        }
+      ],
       "bio": "公开资料待补充。该条目用于记录 Koir 相关研究、站点和公开联系方式。",
       "siteId": "koir-api",
       "highlight": "多模型聚合与接口研究",
       "featureReason": "早期多模型聚合实践，代表技术型线索。",
       "featureAchievement": "围绕多模型聚合和接口兼容做早期实践，是技术型中转线索代表。",
-      "featureTags": ["Koir", "多模型聚合", "接口研究", "技术线索"]
-    },
-    {
-      "id": "cctest-maintainer",
-      "name": "ccTest",
-      "title": "检测站维护者",
-      "subtitle": "API 兼容性检测与状态观察",
-      "avatarText": "CC",
-      "tags": ["检测站维护者", "接口兼容"],
-      "identities": ["检测站维护者", "接口状态观察者"],
-      "contacts": [
-        { "type": "wechat", "label": "微信", "value": "cctest_official" },
-        { "type": "telegram", "label": "Telegram", "value": "t.me/cctest_relay" }
-      ],
-      "links": [{ "label": "Telegram", "url": "https://t.me/cctest_relay" }],
-      "bio": "公开资料待补充。该条目用于记录 ccTest 相关检测能力和关联站点。",
-      "siteId": "cctest-relay",
-      "highlight": "接口兼容性监测",
-      "featureReason": "兼容性检测与状态观察，补足稳定性判断。",
-      "featureAchievement": "以兼容性检测和状态观察切入，帮助判断中转站模型在线与稳定性。",
-      "featureTags": ["检测工具", "状态观察", "兼容性", "可信线索"]
+      "featureTags": [
+        "Koir",
+        "多模型聚合",
+        "接口研究",
+        "技术线索"
+      ]
     },
     {
       "id": "btc193",
@@ -68,9 +148,21 @@
       "title": "中转站运营者",
       "subtitle": "公开自称“丢了 193 个比特币的男人”",
       "avatarText": "193",
-      "tags": ["强人物标签", "站点运营者"],
-      "identities": ["中转站运营者", "公开社交资料标签人物"],
-      "contacts": [{ "type": "x", "label": "X", "value": "待补充公开主页" }],
+      "tags": [
+        "强人物标签",
+        "站点运营者"
+      ],
+      "identities": [
+        "中转站运营者",
+        "公开社交资料标签人物"
+      ],
+      "contacts": [
+        {
+          "type": "x",
+          "label": "X",
+          "value": "待补充公开主页"
+        }
+      ],
       "links": [],
       "bio": "公开资料待补充。该条目仅记录公开主页自述标签，不对事件真实性作额外判断。",
       "siteId": "btc-route",
@@ -82,9 +174,21 @@
       "title": "API 网关维护者",
       "subtitle": "New API 生态相关部署与维护",
       "avatarText": "N",
-      "tags": ["网关维护", "开源部署"],
-      "identities": ["API 网关维护者", "站点技术负责人"],
-      "contacts": [{ "type": "github", "label": "GitHub", "value": "待补充公开主页" }],
+      "tags": [
+        "网关维护",
+        "开源部署"
+      ],
+      "identities": [
+        "API 网关维护者",
+        "站点技术负责人"
+      ],
+      "contacts": [
+        {
+          "type": "github",
+          "label": "GitHub",
+          "value": "待补充公开主页"
+        }
+      ],
       "links": [],
       "bio": "公开资料待补充。该条目用于记录 New API 相关站点维护者。",
       "siteId": "newapi-node",
@@ -96,9 +200,21 @@
       "title": "Claude 中转维护者",
       "subtitle": "Claude / OpenAI 兼容接口维护",
       "avatarText": "CR",
-      "tags": ["Claude 中转", "站点运营"],
-      "identities": ["中转站运营者", "API 代理服务维护者"],
-      "contacts": [{ "type": "wechat", "label": "微信", "value": "待补充公开微信" }],
+      "tags": [
+        "Claude 中转",
+        "站点运营"
+      ],
+      "identities": [
+        "中转站运营者",
+        "API 代理服务维护者"
+      ],
+      "contacts": [
+        {
+          "type": "wechat",
+          "label": "微信",
+          "value": "待补充公开微信"
+        }
+      ],
       "links": [],
       "bio": "公开资料待补充。该条目用于记录 Claude API 中转站的负责人和联系方式。",
       "siteId": "claude-route",
@@ -110,9 +226,21 @@
       "title": "模型号池玩家",
       "subtitle": "多模型资源与号池调度",
       "avatarText": "MP",
-      "tags": ["号池", "多模型"],
-      "identities": ["号池资源维护者", "API 代理服务维护者"],
-      "contacts": [{ "type": "telegram", "label": "Telegram", "value": "待补充公开群" }],
+      "tags": [
+        "号池",
+        "多模型"
+      ],
+      "identities": [
+        "号池资源维护者",
+        "API 代理服务维护者"
+      ],
+      "contacts": [
+        {
+          "type": "telegram",
+          "label": "Telegram",
+          "value": "待补充公开群"
+        }
+      ],
       "links": [],
       "bio": "公开资料待补充。该条目用于记录模型资源池相关站点。",
       "siteId": "modelpool-api",
@@ -124,9 +252,20 @@
       "title": "中转站运营者",
       "subtitle": "小规模稳定站点维护",
       "avatarText": "南",
-      "tags": ["小规模站点", "微信可联系"],
-      "identities": ["中转站运营者"],
-      "contacts": [{ "type": "wechat", "label": "微信", "value": "待补充公开微信" }],
+      "tags": [
+        "小规模站点",
+        "微信可联系"
+      ],
+      "identities": [
+        "中转站运营者"
+      ],
+      "contacts": [
+        {
+          "type": "wechat",
+          "label": "微信",
+          "value": "待补充公开微信"
+        }
+      ],
       "links": [],
       "bio": "公开资料待补充。该条目用于记录小规模站点负责人。",
       "siteId": "nanshan-relay",
@@ -138,8 +277,13 @@
       "title": "API 代理服务维护者",
       "subtitle": "OpenAI / Gemini 转发接口",
       "avatarText": "银",
-      "tags": ["OpenAI", "Gemini"],
-      "identities": ["API 代理服务维护者"],
+      "tags": [
+        "OpenAI",
+        "Gemini"
+      ],
+      "identities": [
+        "API 代理服务维护者"
+      ],
       "contacts": [],
       "links": [],
       "bio": "公开资料待补充。当前只记录站点状态与关联关系。",
@@ -152,9 +296,20 @@
       "title": "API Relay 运营者",
       "subtitle": "面向开发测试的中转服务",
       "avatarText": "北",
-      "tags": ["开发测试", "API Relay"],
-      "identities": ["中转站运营者"],
-      "contacts": [{ "type": "email", "label": "邮箱", "value": "待补充公开邮箱" }],
+      "tags": [
+        "开发测试",
+        "API Relay"
+      ],
+      "identities": [
+        "中转站运营者"
+      ],
+      "contacts": [
+        {
+          "type": "email",
+          "label": "邮箱",
+          "value": "待补充公开邮箱"
+        }
+      ],
       "links": [],
       "bio": "公开资料待补充。该条目用于记录开发测试型 API Relay。",
       "siteId": "north-relay-api",
@@ -169,7 +324,11 @@
       "apiBase": "https://api.ai-route.example/v1",
       "entryUrl": "https://ai-route.example/register",
       "type": "Claude / OpenAI",
-      "models": ["Claude", "OpenAI", "Gemini"],
+      "models": [
+        "Claude",
+        "OpenAI",
+        "Gemini"
+      ],
       "ownerId": "sub2api-author",
       "network": "可达",
       "modelStatus": "在线",
@@ -177,7 +336,11 @@
       "latencyMs": 172,
       "uptime24h": 99.1,
       "announcement": "公告正常",
-      "characteristics": ["Sub2API 生态入口", "适合开发测试", "多模型聚合"]
+      "characteristics": [
+        "Sub2API 生态入口",
+        "适合开发测试",
+        "多模型聚合"
+      ]
     },
     {
       "id": "koir-api",
@@ -186,7 +349,11 @@
       "apiBase": "https://api.koir.example/v1",
       "entryUrl": "https://koir.example",
       "type": "多模型聚合",
-      "models": ["Claude", "OpenAI", "Grok"],
+      "models": [
+        "Claude",
+        "OpenAI",
+        "Grok"
+      ],
       "ownerId": "koir-lab",
       "network": "可达",
       "modelStatus": "在线",
@@ -194,24 +361,37 @@
       "latencyMs": 204,
       "uptime24h": 98.1,
       "announcement": "公告已更新",
-      "characteristics": ["早期接口研究", "多模型聚合", "公开资料待补充"]
+      "characteristics": [
+        "早期接口研究",
+        "多模型聚合",
+        "公开资料待补充"
+      ]
     },
     {
-      "id": "cctest-relay",
-      "name": "ccTest Relay",
-      "domain": "cctest.example",
-      "apiBase": "https://api.cctest.example/v1",
-      "entryUrl": "https://cctest.example",
-      "type": "兼容性检测关联站",
-      "models": ["Claude", "OpenAI"],
-      "ownerId": "cctest-maintainer",
+      "id": "i7relay",
+      "name": "i7Relay",
+      "domain": "i7dc.com",
+      "apiBase": "https://i7dc.com/api/v1",
+      "entryUrl": "https://i7dc.com/",
+      "type": "Claude Code / Codex / Gemini 中转",
+      "models": [
+        "Claude Code",
+        "Codex CLI",
+        "Gemini CLI",
+        "Kiro"
+      ],
+      "ownerId": "qianyu-i7relay",
       "network": "可达",
       "modelStatus": "在线",
-      "firstTokenMs": 910,
-      "latencyMs": 188,
-      "uptime24h": 98.7,
-      "announcement": "公告正常",
-      "characteristics": ["接口兼容性监测", "状态观察", "适合核验"]
+      "firstTokenMs": 820,
+      "latencyMs": 168,
+      "uptime24h": 99.2,
+      "announcement": "公开页面正常",
+      "characteristics": [
+        "i7Relay 主打 Claude Code、Codex CLI、Gemini CLI 等开发者中转场景",
+        "ccTest 提供黑盒检测、模型来源判定与监控 API，是中转检测的重要参考标准",
+        "维护者公开位置为日本，社区辨识度较高"
+      ]
     },
     {
       "id": "btc-route",
@@ -220,7 +400,10 @@
       "apiBase": "https://api.btc-route.example/v1",
       "entryUrl": "https://btc-route.example",
       "type": "Claude / OpenAI 中转",
-      "models": ["Claude", "OpenAI"],
+      "models": [
+        "Claude",
+        "OpenAI"
+      ],
       "ownerId": "btc193",
       "network": "可达",
       "modelStatus": "在线",
@@ -228,7 +411,11 @@
       "latencyMs": 231,
       "uptime24h": 97.4,
       "announcement": "待观察",
-      "characteristics": ["人物标签强", "公开主页待补充", "站点状态待持续监控"]
+      "characteristics": [
+        "人物标签强",
+        "公开主页待补充",
+        "站点状态待持续监控"
+      ]
     },
     {
       "id": "newapi-node",
@@ -237,7 +424,11 @@
       "apiBase": "https://api.newapi-node.example/v1",
       "entryUrl": "https://newapi-node.example",
       "type": "New API 网关",
-      "models": ["OpenAI", "Gemini", "Midjourney"],
+      "models": [
+        "OpenAI",
+        "Gemini",
+        "Midjourney"
+      ],
       "ownerId": "newapi-operator",
       "network": "可达",
       "modelStatus": "在线",
@@ -245,7 +436,11 @@
       "latencyMs": 164,
       "uptime24h": 99.3,
       "announcement": "公告正常",
-      "characteristics": ["网关部署", "模型较全", "公开资料待补充"]
+      "characteristics": [
+        "网关部署",
+        "模型较全",
+        "公开资料待补充"
+      ]
     },
     {
       "id": "claude-route",
@@ -254,7 +449,10 @@
       "apiBase": "https://api.claude-route.example/v1",
       "entryUrl": "https://claude-route.example/register",
       "type": "Claude 中转",
-      "models": ["Claude", "OpenAI"],
+      "models": [
+        "Claude",
+        "OpenAI"
+      ],
       "ownerId": "claude-route-owner",
       "network": "可达",
       "modelStatus": "在线",
@@ -262,7 +460,11 @@
       "latencyMs": 196,
       "uptime24h": 98.6,
       "announcement": "公告正常",
-      "characteristics": ["主打 Claude", "微信可联系", "适合 API 调用"]
+      "characteristics": [
+        "主打 Claude",
+        "微信可联系",
+        "适合 API 调用"
+      ]
     },
     {
       "id": "modelpool-api",
@@ -271,7 +473,12 @@
       "apiBase": "https://api.modelpool.example/v1",
       "entryUrl": "https://modelpool.example",
       "type": "模型号池",
-      "models": ["Claude", "OpenAI", "Gemini", "Grok"],
+      "models": [
+        "Claude",
+        "OpenAI",
+        "Gemini",
+        "Grok"
+      ],
       "ownerId": "modelpool",
       "network": "可达",
       "modelStatus": "在线",
@@ -279,7 +486,11 @@
       "latencyMs": 242,
       "uptime24h": 96.8,
       "announcement": "待观察",
-      "characteristics": ["多模型", "资源池", "需要持续监控"]
+      "characteristics": [
+        "多模型",
+        "资源池",
+        "需要持续监控"
+      ]
     },
     {
       "id": "nanshan-relay",
@@ -288,15 +499,22 @@
       "apiBase": "https://api.nanshan.example/v1",
       "entryUrl": "https://nanshan.example",
       "type": "小规模中转",
-      "models": ["Claude", "OpenAI"],
+      "models": [
+        "Claude",
+        "OpenAI"
+      ],
       "ownerId": "nanshan-api",
       "network": "可达",
       "modelStatus": "在线",
       "firstTokenMs": 970,
       "latencyMs": 209,
-      "uptime24h": 98.0,
+      "uptime24h": 98,
       "announcement": "公告正常",
-      "characteristics": ["小规模", "联系清晰", "适合轻量调用"]
+      "characteristics": [
+        "小规模",
+        "联系清晰",
+        "适合轻量调用"
+      ]
     },
     {
       "id": "ginkgo-api",
@@ -305,7 +523,10 @@
       "apiBase": "https://api.ginkgo.example/v1",
       "entryUrl": "https://ginkgo.example",
       "type": "OpenAI / Gemini 中转",
-      "models": ["OpenAI", "Gemini"],
+      "models": [
+        "OpenAI",
+        "Gemini"
+      ],
       "ownerId": "ginkgo-node",
       "network": "可达",
       "modelStatus": "部分在线",
@@ -313,7 +534,11 @@
       "latencyMs": 266,
       "uptime24h": 95.9,
       "announcement": "待观察",
-      "characteristics": ["OpenAI", "Gemini", "资料待补充"]
+      "characteristics": [
+        "OpenAI",
+        "Gemini",
+        "资料待补充"
+      ]
     },
     {
       "id": "north-relay-api",
@@ -322,7 +547,10 @@
       "apiBase": "https://api.north-relay.example/v1",
       "entryUrl": "https://north-relay.example",
       "type": "开发测试中转",
-      "models": ["OpenAI", "Claude"],
+      "models": [
+        "OpenAI",
+        "Claude"
+      ],
       "ownerId": "north-relay",
       "network": "可达",
       "modelStatus": "在线",
@@ -330,7 +558,11 @@
       "latencyMs": 182,
       "uptime24h": 98.9,
       "announcement": "公告正常",
-      "characteristics": ["开发测试", "接口简洁", "资料待补充"]
+      "characteristics": [
+        "开发测试",
+        "接口简洁",
+        "资料待补充"
+      ]
     }
   ]
 }

@@ -210,7 +210,7 @@ function renderDetail(id) {
   const site = findSite(person.siteId);
   roots.detail.innerHTML = `
     <section class="detail-hero">
-      <div class="avatar large">${escapeHtml(person.avatarText || person.name.slice(0, 1))}</div>
+      ${avatar(person, "large")}
       <div>
         <p class="eyebrow">Combined Profile</p>
         <h1 id="detail-title">${escapeHtml(person.name)}${site ? ` / ${escapeHtml(site.name)}` : ""}</h1>
@@ -373,7 +373,7 @@ function featuredCard(person) {
     <article class="featured-card" data-detail="${escapeAttribute(person.id)}">
       <div class="featured-main">
         <div class="featured-avatar-wrap ${wechat ? "featured-wechat" : ""}" ${wechat ? `aria-label="微信 ${escapeAttribute(wechat.value || wechat.label || "待补充")}" tabindex="0"` : ""}>
-          <div class="avatar featured-avatar">${escapeHtml(person.avatarText || person.name.slice(0, 1))}</div>
+          ${avatar(person, "featured-avatar")}
           ${wechat ? featuredWechat(wechat) : ""}
         </div>
         <div class="featured-info">
@@ -415,6 +415,15 @@ function featuredWechat(contact) {
   `;
 }
 
+function avatar(person, className = "") {
+  const label = person.name || "人物头像";
+  const text = person.avatarText || label.slice(0, 1);
+  if (person.avatarUrl) {
+    return `<img class="avatar ${escapeAttribute(className)}" src="${escapeAttribute(person.avatarUrl)}" alt="${escapeAttribute(label)}" />`;
+  }
+  return `<div class="avatar ${escapeAttribute(className)}">${escapeHtml(text)}</div>`;
+}
+
 function personCard(person) {
   const site = findSite(person.siteId);
   const contacts = (person.contacts || []).filter((contact) => contact.type !== "wechat").slice(0, 2);
@@ -430,7 +439,7 @@ function personCard(person) {
     <article class="person-card" data-detail="${escapeAttribute(person.id)}">
       <div class="person-card-head">
         <div class="featured-avatar-wrap person-avatar-wrap ${wechat ? "featured-wechat" : ""}" ${wechat ? `aria-label="微信 ${escapeAttribute(wechat.value || wechat.label || "待补充")}" tabindex="0"` : ""}>
-          <div class="avatar featured-avatar person-avatar">${escapeHtml(person.avatarText || person.name.slice(0, 1))}</div>
+          ${avatar(person, "featured-avatar person-avatar")}
           ${wechat ? featuredWechat(wechat) : ""}
         </div>
         <div class="person-card-title">
