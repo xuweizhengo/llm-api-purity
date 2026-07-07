@@ -1,34 +1,42 @@
 {
-  "name": "llm-api-purity",
-  "version": "0.1.0",
-  "description": "AI API relay people atlas with curated operator profiles, site directory, status metrics, and lead submission.",
-  "type": "module",
-  "private": false,
-  "scripts": {
-    "start": "node server.js",
-    "dev": "node --watch server.js",
-    "import:ecosystem": "node scripts/import-ecosystem.mjs",
-    "import:proxyai": "node scripts/import-proxyai-sites.mjs",
-    "check": "node --check server.js && node --check src/store.js && node --check public/app.js"
-  },
-  "keywords": [
-    "llm",
-    "openai",
-    "claude",
-    "anthropic",
-    "api",
-    "relay",
-    "directory",
-    "people",
-    "atlas",
-    "monitor"
-  ],
-  "author": "xuweizhengo",
-  "license": "MIT",
-  "engines": {
-    "node": ">=20"
-  },
-  "dependencies": {
-    "pg": "^8.22.0"
-  }
+    "name":  "llm-api-purity",
+    "version":  "0.1.0",
+    "description":  "AI API relay people atlas with curated operator profiles, site directory, status metrics, and lead submission.",
+    "type":  "module",
+    "private":  false,
+    "scripts":  {
+                    "start":  "node server.js",
+                    "dev":  "node --watch server.js",
+                    "import:ecosystem":  "node scripts/import-ecosystem.mjs",
+                    "import:proxyai":  "node scripts/import-proxyai-sites.mjs",
+                    "check":  "node --check server.js \u0026\u0026 node --check src/store.js \u0026\u0026 node --check public/app.js"
+                },
+    "keywords":  [
+                     "llm",
+                     "openai",
+                     "claude",
+                     "anthropic",
+                     "api",
+                     "relay",
+                     "directory",
+                     "people",
+                     "atlas",
+                     "monitor"
+                 ],
+    "author":  "xuweizhengo",
+    "license":  "MIT",
+    "engines":  {
+                    "node":  "\u003e=20"
+                },
+    "dependencies":  {
+                         "pg":  "^8.22.0"
+                     },
+    "repository":  {
+                       "type":  "git",
+                       "url":  "git+https://github.com/xuweizhengo/llm-api-purity.git"
+                   },
+    "homepage":  "https://github.com/xuweizhengo/llm-api-purity#readme",
+    "bugs":  {
+                 "url":  "https://github.com/xuweizhengo/llm-api-purity/issues"
+             }
 }
